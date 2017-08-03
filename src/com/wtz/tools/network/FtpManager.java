@@ -11,7 +11,6 @@ import org.apache.commons.net.ftp.FTPReply;
 import android.content.Context;
 import android.util.Log;
 
-
 public class FtpManager {
     private final String TAG = FtpManager.class.getName();
 
@@ -25,17 +24,18 @@ public class FtpManager {
     private static final int CONNECT_TIMEOUT = 10 * 1000;
     private static final int DATA_TIMEOUT_MIN = 5 * 60 * 1000;// mili-second
     private static final int DATA_SPEED = 60 * 1024;// Byte/Second
-	private static final String FTP_PATH_SEPERATOR = "/";
-    
+    private static final String FTP_PATH_SEPERATOR = "/";
+
     public FtpManager(String host, int port, String userName, String passWord) {
         mHost = host;
         mPort = port;
         mUserName = userName;
         mPassWord = passWord;
     }
-    
+
     /**
-     * @param fileSize byteSize
+     * @param fileSize
+     *            byteSize
      * @return
      */
     private int getDataTimeout(long fileSize) {
@@ -43,7 +43,7 @@ public class FtpManager {
         if (timeout < DATA_TIMEOUT_MIN) {
             timeout = DATA_TIMEOUT_MIN;
         }
-        
+
         return timeout;
     }
 
@@ -86,8 +86,8 @@ public class FtpManager {
      * @return 成功与否
      * 
      */
-    private boolean upload(String host, int port, String path, String username,
-            String password, File file) {
+    private boolean upload(String host, int port, String path, String username, String password,
+            File file) {
         mCurrentFtp = new FTPClient();
 
         try {
@@ -123,7 +123,7 @@ public class FtpManager {
             if (!mCurrentFtp.changeWorkingDirectory(path)) {
                 String log = "ftp changeWorkingDirectory failed: " + path;
                 Log.d(TAG, log);
-                
+
                 String dirName = new String(path.getBytes(), "iso-8859-1");
                 Log.d(TAG, "to make dir: " + dirName);
                 if (!makeMutiLevelDirectory(mCurrentFtp, dirName)) {
@@ -131,9 +131,9 @@ public class FtpManager {
                     return false;
                 }
                 if (!mCurrentFtp.changeWorkingDirectory(path)) {
-					Log.d(TAG, "ftp changeWorkingDirectory secondly failed: " + path);
-					return false;
-				}
+                    Log.d(TAG, "ftp changeWorkingDirectory secondly failed: " + path);
+                    return false;
+                }
             }
 
             // Use passive mode to pass firewalls.
@@ -149,28 +149,28 @@ public class FtpManager {
             e.printStackTrace();
             return false;
         } finally {
-        	disconnectFtp();
+            disconnectFtp();
         }
 
         return true;
     }
-    
+
     private boolean makeMutiLevelDirectory(FTPClient ftp, String path) {
-		// 创建多层目录
-		StringTokenizer tokens = new StringTokenizer(path, FTP_PATH_SEPERATOR);
-		tokens.countTokens();
-		String pathName = "";
-		while (tokens.hasMoreElements()) {
-			pathName = pathName + FTP_PATH_SEPERATOR + (String) tokens.nextElement();
-			try {
-				ftp.mkd(pathName);
-			} catch (Exception e) {
-				e.printStackTrace();
-				return false;
-			}
-		}
-		return true;
-	}
+        // 创建多层目录
+        StringTokenizer tokens = new StringTokenizer(path, FTP_PATH_SEPERATOR);
+        tokens.countTokens();
+        String pathName = "";
+        while (tokens.hasMoreElements()) {
+            pathName = pathName + FTP_PATH_SEPERATOR + (String) tokens.nextElement();
+            try {
+                ftp.mkd(pathName);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * 
@@ -186,15 +186,17 @@ public class FtpManager {
             if (file.isDirectory()) {
                 Log.d(TAG, "to store directory " + file.getName());
                 String dirName = new String(file.getName().getBytes(), targetCharset);
-                if (!ftp.makeDirectory(dirName)) {
-                    String log = "ftp makeDirectory failed: " + dirName;
-                    Log.d(TAG, log);
-                    return false;
-                }
                 if (!ftp.changeWorkingDirectory(dirName)) {
-                    String log = "ftp changeWorkingDirectory failed: " + dirName;
-                    Log.d(TAG, log);
-                    return false;
+                    if (!ftp.makeDirectory(dirName)) {
+                        String log = "ftp makeDirectory failed: " + dirName;
+                        Log.d(TAG, log);
+                        return false;
+                    }
+                    if (!ftp.changeWorkingDirectory(dirName)) {
+                        String log = "ftp changeWorkingDirectory failed: " + dirName;
+                        Log.d(TAG, log);
+                        return false;
+                    }
                 }
                 String[] childFiles = file.list();
                 for (int i = 0; i < childFiles.length; i++) {
@@ -245,7 +247,7 @@ public class FtpManager {
         Log.d(TAG, "upload success! ");
         return true;
     }
-    
+
     public void disconnectFtp() {
         Log.d(TAG, "to disconnectFtp");
         if (mCurrentFtp != null && mCurrentFtp.isConnected()) {

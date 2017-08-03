@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -25,6 +26,7 @@ import android.graphics.RectF;
 import android.graphics.Shader.TileMode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.util.Log;
@@ -398,6 +400,63 @@ public class BitmapUtils {
         Canvas canvas = new Canvas(bitmap);
         view.draw(canvas);
 
+        return bitmap;
+    }
+    
+    /**
+     * @param colorString
+     *            Supported formats are: •#RRGGBB •#AARRGGBB
+     * 
+     * @param radius
+     *            The radius in pixels of the corners of the rectangle shape
+     * @return
+     */
+    public static Drawable getShapeDrawable(String colorString, float radius) {
+        GradientDrawable gradientDrawable = new GradientDrawable();
+        gradientDrawable.setColor(Color.parseColor(colorString));
+        gradientDrawable.setCornerRadius(radius);
+        return gradientDrawable;
+    }
+    
+    /**
+     * 渐变效果图，
+     *
+     * @param context
+     * @param resource
+     * @param centerX
+     *            渐变开始的地方（0~1）
+     * @param endX
+     *            渐变结束地地方（0~1，>centerX）
+     * @return
+     */
+    public static Bitmap gradient(Bitmap resource, float centerX, float endX) {
+        int height = resource.getHeight();
+        int width = resource.getWidth();
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
+        int[] resPixels = new int[width * height];
+        int[] srcPixels = new int[width * height];
+        resource.getPixels(resPixels, 0, width, 0, 0, width, height);
+        int end = (int) (width * endX);
+        int center = (int) (width * centerX);
+        int pos, pixColor, pixR, pixG, pixB, pixA;
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                pos = i * width + j;
+                if (j < center) {
+                    srcPixels[pos] = Color.argb(0, 0, 0, 0);
+                } else if (j >= center && j < end) {
+                    pixColor = resPixels[pos];
+                    pixR = Color.red(pixColor);
+                    pixG = Color.green(pixColor);
+                    pixB = Color.blue(pixColor);
+                    pixA = (int) (1.0 * Color.alpha(pixColor) * (j - center) / (end - center));
+                    srcPixels[pos] = Color.argb(pixA, pixR, pixG, pixB);
+                } else {
+                    srcPixels[pos] = resPixels[pos];
+                }
+            }
+        }
+        bitmap.setPixels(srcPixels, 0, width, 0, 0, width, height);
         return bitmap;
     }
 }

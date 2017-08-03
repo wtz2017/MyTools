@@ -91,4 +91,13 @@ public class StringUtil {
         
         return e.toString();
     }
+    
+    /**
+     * @param hex 基于int最大为2147483647，所以hex最大不可超过"7FFFFFFF"
+     * @return
+     * @throws Exception
+     */
+    public static int hexStringToInt(String hex) throws Exception {
+        return Integer.valueOf(hex, 16);
+    }
 }

@@ -177,4 +177,24 @@ public class DateTimeUtil {
         }
         return day;
     }
+    
+    /**
+     * @param dateStr
+     *            日期字符串
+     * @param formatStr
+     *            格式字符串
+     * @return 日期字符串是否符合指定格式字符串
+     */
+    public static boolean isDateFormatValid(String dateStr, String formatStr) {
+        boolean convertSuccess = true;
+        SimpleDateFormat format = new SimpleDateFormat(formatStr);
+        try {
+            // 设置lenient为false，否则SimpleDateFormat会比较宽松地验证日期
+            format.setLenient(false);
+            format.parse(dateStr);
+        } catch (Exception e) {
+            convertSuccess = false;
+        }
+        return convertSuccess;
+    }
 }
