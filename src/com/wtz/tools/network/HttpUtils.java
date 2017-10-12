@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -89,6 +90,55 @@ public class HttpUtils {
         }
     }
     
+    public static String postJson(String actionUrl, String jsonStr) throws Exception {
+        HttpURLConnection conn = null;
+        OutputStreamWriter outStream = null;
+        InputStream inStream = null;
+        String response = null;
+
+        try {
+            URI uri = new URI(actionUrl);
+            URL url = new URL(uri.toString());
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(5000);// TODO
+            conn.setReadTimeout(5000);// TODO
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+            conn.setUseCaches(false);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("connection", "keep-alive");
+            conn.setRequestProperty("Charset", "UTF-8");
+            conn.setRequestProperty("Content-Type", "application/json");
+
+            if (jsonStr != null) {
+                outStream = new OutputStreamWriter(conn.getOutputStream(), "utf-8");
+                outStream.write(jsonStr);
+                outStream.flush();
+            }
+
+            int responseCode = conn.getResponseCode();
+            System.out.println("http post: responseCode = " + responseCode + ", url:" + actionUrl);
+            if (responseCode == HTTP_OK) {
+                inStream = conn.getInputStream();
+            } else {
+                inStream = conn.getErrorStream();
+            }
+            response = getResponse(inStream);
+        } finally {
+            if (outStream != null) {
+                outStream.close();
+            }
+            if (inStream != null) {
+                inStream.close();
+            }
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+
+        return response;
+    }
+    
     /**
      * 通过拼接的方式构造请求内容，实现参数传输以及文件传输
      * 
@@ -118,13 +168,14 @@ public class HttpUtils {
             URI uri = new URI(actionUrl);
             URL url = new URL(uri.toString());
             conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(5 * 1000); // TODO 缓存的最长时间
+            conn.setConnectTimeout(5000);// TODO
+            conn.setReadTimeout(5000); // TODO
             conn.setDoInput(true);// 允许输入
             conn.setDoOutput(true);// 允许输出
             conn.setUseCaches(false); // 不允许使用缓存
             conn.setRequestMethod("POST");
             conn.setRequestProperty("connection", "keep-alive");
-            conn.setRequestProperty("Charsert", "UTF-8");
+            conn.setRequestProperty("Charset", "UTF-8");
             conn.setRequestProperty("Content-Type", MULTIPART_FORM_DATA + ";boundary=" + BOUNDARY);
 
             // 发送参数
@@ -234,13 +285,14 @@ public class HttpUtils {
             URI uri = new URI(actionUrl);
             URL url = new URL(uri.toString());
             conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(5 * 1000); // 缓存的最长时间
+            conn.setConnectTimeout(5000);// TODO
+            conn.setReadTimeout(5000); // TODO
             conn.setDoInput(true);// 允许输入
             conn.setDoOutput(true);// 允许输出
             conn.setUseCaches(false); // 不允许使用缓存
             conn.setRequestMethod("POST");
             conn.setRequestProperty("connection", "keep-alive");
-            conn.setRequestProperty("Charsert", "UTF-8");
+            conn.setRequestProperty("Charset", "UTF-8");
             conn.setRequestProperty("Content-Type", MULTIPART_FORM_DATA + ";boundary=" + BOUNDARY);
 
             // 发送参数
