@@ -7,9 +7,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -32,30 +34,36 @@ import android.util.Log;
 public class HttpUtils {
     private final static String TAG = HttpUtils.class.getSimpleName();
 
-    private static final String METHOD_GET = "GET";
     private static final int HTTP_OK = 200;
-    private static final int BUFFER = 1024 * 8;
 
-    public static String get(String urlStr, int connectTimeout, int readTimeout, long id)
+    public static String get(String urlStr, Map<String, String> params, int connectTimeout, int readTimeout)
             throws Exception {
-        Log.d(TAG, "http get: [id = " + id + "]...url = " + urlStr);
-
-        URL url = null;
+        if (urlStr == null) {
+            return null;
+        }
+        StringBuilder fullUrlBuilder = new StringBuilder(urlStr);
+        if (params != null) {
+            String paramStr = parameters2String(params);
+            if (paramStr != null && !paramStr.equals("")) {
+                fullUrlBuilder.append("?").append(paramStr);
+            }
+        }
+        
         HttpURLConnection conn = null;
         InputStream inStream = null;
+        int responseCode;
         String response = null;
         try {
-            URI uri = new URI(urlStr);
-            url = new URL(uri.toString());
+            URI uri = new URI(fullUrlBuilder.toString());
+            URL url = new URL(uri.toString());
             conn = (HttpURLConnection) url.openConnection();
             conn.setDoInput(true);
             conn.setConnectTimeout(1000 * connectTimeout);
             conn.setReadTimeout(1000 * readTimeout);
-            conn.setRequestMethod(METHOD_GET);
+            conn.setRequestMethod("GET");
             conn.setRequestProperty("accept", "*/*");
             conn.connect();
-            int responseCode = conn.getResponseCode();
-            Log.d(TAG, "http get: responseCode = " + responseCode);
+            responseCode = conn.getResponseCode();
             if (responseCode == HTTP_OK) {
                 inStream = conn.getInputStream();
             } else {
@@ -70,54 +78,42 @@ public class HttpUtils {
             }
         }
 
-        Log.d(TAG, "http get response: [id = " + id + "]...response = " + response);
+        System.out.println("http get...url=" + fullUrlBuilder.toString()
+        + ";\r\n" + "responseCode = " + responseCode
+        + ";\r\n" + "response=" + response);
         return response;
     }
 
-    private static String getResponse(InputStream inStream) {
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            int len = -1;
-            byte[] buffer = new byte[BUFFER];
-            while ((len = inStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, len);
-            }
-            byte[] data = outputStream.toByteArray();
-            return new String(data);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "getResponse error!";
-        }
-    }
-    
-    public static String postJson(String actionUrl, String jsonStr) throws Exception {
+    public static String postForm(String actionUrl, Map<String, String> params, int connectTimeout, int readTimeout) throws Exception {
         HttpURLConnection conn = null;
         OutputStreamWriter outStream = null;
         InputStream inStream = null;
+        int responseCode;
         String response = null;
 
         try {
             URI uri = new URI(actionUrl);
             URL url = new URL(uri.toString());
             conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(5000);// TODO
-            conn.setReadTimeout(5000);// TODO
+            conn.setConnectTimeout(1000 * connectTimeout);
+            conn.setReadTimeout(1000 * readTimeout);
             conn.setDoInput(true);
             conn.setDoOutput(true);
             conn.setUseCaches(false);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("connection", "keep-alive");
             conn.setRequestProperty("Charset", "UTF-8");
-            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.connect();
 
-            if (jsonStr != null) {
+            String paramStr = null;
+            if (params != null && (paramStr = parameters2String(params)) != null) {
                 outStream = new OutputStreamWriter(conn.getOutputStream(), "utf-8");
-                outStream.write(jsonStr);
+                outStream.write(paramStr);
                 outStream.flush();
             }
 
-            int responseCode = conn.getResponseCode();
-            System.out.println("http post: responseCode = " + responseCode + ", url:" + actionUrl);
+            responseCode = conn.getResponseCode();
             if (responseCode == HTTP_OK) {
                 inStream = conn.getInputStream();
             } else {
@@ -136,6 +132,62 @@ public class HttpUtils {
             }
         }
 
+        System.out.println("http post...url=" + actionUrl
+        + ";\r\n" + "responseCode = " + responseCode
+        + ";\r\n" + "response=" + response);
+        return response;
+    }
+    
+    public static String postJson(String actionUrl, String jsonStr, int connectTimeout, int readTimeout) throws Exception {
+        HttpURLConnection conn = null;
+        OutputStreamWriter outStream = null;
+        InputStream inStream = null;
+        int responseCode;
+        String response = null;
+
+        try {
+            URI uri = new URI(actionUrl);
+            URL url = new URL(uri.toString());
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(1000 * connectTimeout);
+            conn.setReadTimeout(1000 * readTimeout);
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+            conn.setUseCaches(false);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("connection", "keep-alive");
+            conn.setRequestProperty("Charset", "UTF-8");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.connect();
+
+            if (jsonStr != null) {
+                outStream = new OutputStreamWriter(conn.getOutputStream(), "utf-8");
+                outStream.write(jsonStr);
+                outStream.flush();
+            }
+
+            responseCode = conn.getResponseCode();
+            if (responseCode == HTTP_OK) {
+                inStream = conn.getInputStream();
+            } else {
+                inStream = conn.getErrorStream();
+            }
+            response = getResponse(inStream);
+        } finally {
+            if (outStream != null) {
+                outStream.close();
+            }
+            if (inStream != null) {
+                inStream.close();
+            }
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        
+        System.out.println("http post...url=" + actionUrl
+                + ";\r\n" + "responseCode = " + responseCode
+                + ";\r\n" + "response=" + response);
         return response;
     }
     
@@ -152,7 +204,7 @@ public class HttpUtils {
      * @throws IOException
      */
     public static String postFile(String actionUrl, Map<String, String> params,
-            Map<String, File> files) throws Exception {
+            Map<String, File> files, int connectTimeout, int readTimeout) throws Exception {
         String BOUNDARY = java.util.UUID.randomUUID().toString();
         String PREFIX = "--";
         String LINEND = "\r\n";
@@ -162,14 +214,15 @@ public class HttpUtils {
         HttpURLConnection conn = null;
         DataOutputStream outStream = null;
         InputStream inStream = null;
+        int responseCode;
         String response = null;
 
         try {
             URI uri = new URI(actionUrl);
             URL url = new URL(uri.toString());
             conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(5000);// TODO
-            conn.setReadTimeout(5000); // TODO
+            conn.setConnectTimeout(1000 * connectTimeout);
+            conn.setReadTimeout(1000 * readTimeout);
             conn.setDoInput(true);// 允许输入
             conn.setDoOutput(true);// 允许输出
             conn.setUseCaches(false); // 不允许使用缓存
@@ -177,7 +230,8 @@ public class HttpUtils {
             conn.setRequestProperty("connection", "keep-alive");
             conn.setRequestProperty("Charset", "UTF-8");
             conn.setRequestProperty("Content-Type", MULTIPART_FORM_DATA + ";boundary=" + BOUNDARY);
-
+            conn.connect();
+            
             // 发送参数
             if (params != null) {
                 StringBuilder stringBuilder1 = new StringBuilder();
@@ -233,8 +287,7 @@ public class HttpUtils {
                 outStream.flush();
             }
 
-            int responseCode = conn.getResponseCode();
-            System.out.println("http post: responseCode = " + responseCode + ", url:" + actionUrl);
+            responseCode = conn.getResponseCode();
             if (responseCode == HTTP_OK) {
                 inStream = conn.getInputStream();
             } else {
@@ -253,6 +306,9 @@ public class HttpUtils {
             }
         }
 
+        System.out.println("http post...url=" + actionUrl
+                + ";\r\n" + "responseCode = " + responseCode
+                + ";\r\n" + "response=" + response);
         return response;
     }
 
@@ -269,7 +325,7 @@ public class HttpUtils {
      * @throws IOException
      */
     public static String postBytes(String actionUrl, Map<String, String> params,
-            Map<String, byte[]> files) throws Exception {
+            Map<String, byte[]> files, int connectTimeout, int readTimeout) throws Exception {
         String BOUNDARY = java.util.UUID.randomUUID().toString();
         String PREFIX = "--";
         String LINEND = "\r\n";
@@ -279,14 +335,15 @@ public class HttpUtils {
         HttpURLConnection conn = null;
         DataOutputStream outStream = null;
         InputStream inStream = null;
+        int responseCode;
         String response = null;
 
         try {
             URI uri = new URI(actionUrl);
             URL url = new URL(uri.toString());
             conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(5000);// TODO
-            conn.setReadTimeout(5000); // TODO
+            conn.setConnectTimeout(1000 * connectTimeout);
+            conn.setReadTimeout(1000 * readTimeout);
             conn.setDoInput(true);// 允许输入
             conn.setDoOutput(true);// 允许输出
             conn.setUseCaches(false); // 不允许使用缓存
@@ -344,8 +401,7 @@ public class HttpUtils {
                 outStream.flush();
             }
 
-            int responseCode = conn.getResponseCode();
-            System.out.println("http post: responseCode = " + responseCode + ", url:" + actionUrl);
+            responseCode = conn.getResponseCode();
             if (responseCode == HTTP_OK) {
                 inStream = conn.getInputStream();
             } else {
@@ -364,10 +420,13 @@ public class HttpUtils {
             }
         }
 
+        System.out.println("http post...url=" + actionUrl
+                + ";\r\n" + "responseCode = " + responseCode
+                + ";\r\n" + "response=" + response);
         return response;
     }
 
-    public static int postFile(String urlStr, Map<String, String> paramsMap,
+    public static int postFileByApache(String urlStr, Map<String, String> paramsMap,
             Map<String, File> filesMap, int connectTimeout, int soTimeout) throws Exception {
         Log.d(TAG, "httpPostFiles...url = " + urlStr);
         Log.d(TAG, "httpPostFiles...paramsMap = " + paramsMap);
@@ -422,5 +481,58 @@ public class HttpUtils {
             mpEntity.addPart("file", cbFile);
         }
         httppost.setEntity(mpEntity);
+    }
+
+    private static String parameters2String(Map<String, String> params) throws UnsupportedEncodingException{
+        if (params == null) {
+            return null;
+        }
+        StringBuilder paramsBuilder = new StringBuilder();
+        Iterator<Map.Entry<String, String>> entries = params.entrySet().iterator();
+        while (entries.hasNext()) {
+            Map.Entry<String, String> entry = entries.next();
+            paramsBuilder.append(encodeParameter(entry.getKey()));
+            paramsBuilder.append("=");
+            paramsBuilder.append(encodeParameter(entry.getValue()));
+            paramsBuilder.append("&");
+        }
+        String result = paramsBuilder.toString();
+        if (result != null && result.endsWith("&")) {
+            paramsBuilder.deleteCharAt(paramsBuilder.length() - 1);
+        }
+        return result;
+    }
+
+    private static String encodeParameter(String parameter) throws UnsupportedEncodingException {
+        if (parameter == null) {
+            return "";
+        }
+        String encoded = URLEncoder.encode(parameter, "UTF-8");
+        StringBuilder sBuilder = new StringBuilder();
+        for (int i = 0; i < encoded.length(); i++) {
+            char c = encoded.charAt(i);
+            if (c == '+') {
+                sBuilder.append("%20");
+            } else {
+                sBuilder.append(c);
+            }
+        }
+        return sBuilder.toString();
+    }
+
+    private static String getResponse(InputStream inStream) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            int len = -1;
+            byte[] buffer = new byte[1024 * 8];
+            while ((len = inStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, len);
+            }
+            byte[] data = outputStream.toByteArray();
+            return new String(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "getResponse error!";
+        }
     }
 }
