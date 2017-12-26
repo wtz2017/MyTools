@@ -459,4 +459,18 @@ public class BitmapUtils {
         bitmap.setPixels(srcPixels, 0, width, 0, 0, width, height);
         return bitmap;
     }
+    
+    public static Bitmap cutBitmap(Bitmap bmpSrc, int cutX, int cutY, int cutW, int cutH) {
+        if (bmpSrc == null || cutX < 0 || cutY < 0 || cutW <= 0 || cutH <= 0) {
+            return null;
+        }
+        if (cutX + cutW > bmpSrc.getWidth() || cutY + cutH > bmpSrc.getHeight()) {
+            return null;
+        }
+        int[] cutPixels = new int[cutW * cutH];
+        bmpSrc.getPixels(cutPixels, 0, cutW, cutX, cutY, cutW, cutH);
+        // If the config does not support per-pixel alpha (e.g. RGB_565), 
+        // then the alpha bytes in the colors[] will be ignored (assumed to be FF)
+        return Bitmap.createBitmap(cutPixels, 0, cutW, cutW, cutH, Bitmap.Config.ARGB_8888);
+    }
 }
