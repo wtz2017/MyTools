@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
@@ -16,6 +17,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -414,6 +416,47 @@ public class NetworkDeviceUtils {
         }
 
         return null;
+    }
+    
+    public static Map<String, String> readArp() {
+        BufferedReader br = null;
+        Map<String, String> devices = null;
+        try {
+            br = new BufferedReader(new FileReader("/proc/net/arp"));
+            String line = "";
+            String ip = "";
+            String mac = "";
+            devices = new HashMap<String, String>();
+
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.length() < 63) {
+                    continue;
+                }
+                if (line.toUpperCase(Locale.US).contains("IP")) {
+                    continue;
+                }
+                if (line.contains("00:00:00:00:00:00")) {
+                    continue;
+                }
+
+                ip = line.substring(0, 17).trim();
+                mac = line.substring(41, 63).trim();
+                devices.put(ip, mac);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return devices;
     }
 
     public static String getBSSID(Context context) {
