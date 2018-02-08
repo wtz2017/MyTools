@@ -104,6 +104,49 @@ public class FileUtil {
         return file.delete();
     }
     
+    public static boolean copy(File srcFile, File desFile) {
+        boolean result = false;
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+
+        try {
+            if (srcFile == null || !srcFile.exists() || desFile == null) {
+                return false;
+            }
+
+            File desDir = desFile.getParentFile();
+            if (!desDir.exists()) {
+                desDir.mkdirs();
+            }
+
+            fis = new FileInputStream(srcFile);
+            fos = new FileOutputStream(desFile);
+            byte buffer[] = new byte[4096];
+            int readSize = 0;
+            while ((readSize = fis.read(buffer)) > 0) {
+                fos.write(buffer, 0, readSize);
+                fos.flush();
+            }
+            result = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fis != null) {
+                    fis.close();
+                }
+                if (fos != null) {
+                    fos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                result = false;
+            }
+        }
+
+        return result;
+    }
+    
     /**
      * @param cxt
      * @param from asset路径
