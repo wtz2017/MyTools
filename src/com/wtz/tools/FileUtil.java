@@ -12,10 +12,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
 public class FileUtil {
     
@@ -260,4 +262,92 @@ public class FileUtil {
             }
         }
     }
+    
+    public static void saveSoFromApk(String apkPath, String soSavePath) {
+        String ZIPENTRY_NAME_SEPARATOR = "/";
+        File soFile = new File(soSavePath);
+        if (!soFile.exists()) {
+            soFile.mkdirs();
+        }
+
+        ZipFile zipFile = null;
+        try {
+            zipFile = new ZipFile(new File(apkPath));
+            Enumeration<?> enumeration = zipFile.entries();
+            ZipEntry zipEntry = null;
+            while (enumeration.hasMoreElements()) {
+                zipEntry = (ZipEntry) enumeration.nextElement();
+                System.out.println("zipEntry name: " + zipEntry.getName());
+
+                String name = zipEntry.getName();
+                if (name.endsWith(".so")) {
+                    FileOutputStream fos = null;
+                    BufferedOutputStream dest = null;
+                    InputStream in = null;
+                    try {
+                        in = zipFile.getInputStream(zipEntry);
+                        int index = name.lastIndexOf(ZIPENTRY_NAME_SEPARATOR);
+                        String fileName = name.substring(index + 1);
+                        String subFolderName = name.substring(0, index);
+                        File subFolder = new File(soSavePath + File.separator + subFolderName);
+                        if (!subFolder.exists()) {
+                            subFolder.mkdirs();
+                        }
+                        String destPath = subFolder.getAbsolutePath() + File.separator + fileName;
+                        File file = new File(destPath);
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                        file.createNewFile();
+                        int count;
+                        int DATA_BUFFER = 8 * 1024;
+                        byte data[] = new byte[DATA_BUFFER];
+                        fos = new FileOutputStream(file);
+                        dest = new BufferedOutputStream(fos, DATA_BUFFER);
+                        while ((count = in.read(data, 0, DATA_BUFFER)) != -1) {
+                            dest.write(data, 0, count);
+                        }
+                        dest.flush();
+                        // 在循环中及时关闭创建的流对象
+                        if (dest != null) {
+                            dest.close();
+                        }
+                        if (fos != null) {
+                            fos.close();
+                        }
+                        if (in != null) {
+                            in.close();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if (dest != null) {
+                                dest.close();
+                            }
+                            if (in != null) {
+                                in.close();
+                            }
+                            if (fos != null) {
+                                fos.close();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (zipFile != null) {
+                try {
+                    zipFile.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    
 }
