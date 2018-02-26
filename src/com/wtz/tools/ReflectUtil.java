@@ -100,6 +100,28 @@ public class ReflectUtil {
 
         return result;
     }
+    
+    /**
+     * 循环查找当前类及父类中目标方法
+     * @param targetClass
+     * @param methodName
+     * @param parameterTypes
+     * @return
+     */
+    public static Method getDeclaredMethod(Class<?> targetClass, String methodName, Class<?>... parameterTypes) {
+        Method method = null;
+
+        for (Class<?> clazz = targetClass; clazz != Object.class; clazz = clazz.getSuperclass()) {
+            try {
+                method = clazz.getDeclaredMethod(methodName, parameterTypes);
+                return method;
+            } catch (Exception e) {
+//                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
 
     public static Object getClassInstance(Class<?> clazz, Class[] argTypes, Object[] argValues) {
         Object result = null;
