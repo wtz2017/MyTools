@@ -12,7 +12,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -216,10 +220,11 @@ public class FileUtil {
             }
         }
     }
-    
+
     public static String readFile(String filePath) {
         String content = "";
         BufferedReader reader = null;
+        String lineEnd = System.getProperty("line.separator");
         try {
             FileInputStream fin = new FileInputStream(filePath);
             BufferedInputStream bis = new BufferedInputStream(fin);
@@ -227,6 +232,7 @@ public class FileUtil {
             String tempRead = reader.readLine();
             while (tempRead != null) {
                 content += tempRead;
+                content += lineEnd;
                 tempRead = reader.readLine();
             }
         } catch (Exception e) {
@@ -243,7 +249,7 @@ public class FileUtil {
 
         return content;
     }
-    
+
     public static void writeStringToFile(String content, String fileName, boolean append) {
         FileWriter writer = null;
         try {
@@ -255,10 +261,31 @@ public class FileUtil {
             try {
                 if (writer != null) {
                     writer.close();
-                    writer = null;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void mergeFile(File[] files, File target) {
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter(target, false);
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    continue;
+                }
+                String content = readFile(file.getAbsolutePath());
+                writer.write(content);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (Exception e) {
             }
         }
     }
@@ -349,5 +376,35 @@ public class FileUtil {
             }
         }
     }
-    
+
+    /**
+     * 按文件名升序排列
+     */
+    public static List<File> ascendOrderByName(File dir) {
+        if (dir == null || !dir.exists() || !dir.isDirectory()) {
+            return null;
+        }
+        File[] files = dir.listFiles();
+        if (files == null || files.length == 0) {
+            return null;
+        }
+
+        List<File> fileList = new ArrayList<File>();
+        for (File f : files) {
+            fileList.add(f);
+        }
+        Collections.sort(fileList, new Comparator<File>() {
+            @Override
+            public int compare(File o1, File o2) {
+                if (o1.isDirectory() && o2.isFile())
+                    return -1;
+                if (o1.isFile() && o2.isDirectory())
+                    return 1;
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
+
+        return fileList;
+    }
+
 }

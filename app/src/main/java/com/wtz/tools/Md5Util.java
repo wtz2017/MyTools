@@ -76,6 +76,42 @@ public class Md5Util {
 		return map;
 	}
 
+	public static String getBytesMD5(byte[] content) {
+		if (content == null) {
+			return "";
+		}
+
+		MessageDigest digest = null;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+			return byteArrayToHex(digest.digest(content));
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "";
+	}
+
+	public static String getStringMD5(String content) {
+		if (content == null) {
+			return "";
+		}
+
+		MessageDigest digest = null;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+			return byteArrayToHex(digest.digest(content.getBytes()));
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "";
+	}
+
 	private static String byteArrayToHex(byte[] byteArray) {
 		// 首先初始化一个字符数组，用来存放每个16进制字符
 		char[] hexDigits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };

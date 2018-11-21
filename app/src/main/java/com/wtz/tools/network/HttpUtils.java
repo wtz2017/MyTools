@@ -1,518 +1,544 @@
 package com.wtz.tools.network;
 
+import android.text.TextUtils;
+import android.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.ContentBody;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreConnectionPNames;
-import org.apache.http.params.CoreProtocolPNames;
-import org.apache.http.util.EntityUtils;
-
-import android.text.TextUtils;
-import android.util.Log;
 
 public class HttpUtils {
     private final static String TAG = HttpUtils.class.getSimpleName();
 
-    private static final int HTTP_OK = 200;
+    private static final String METHOD_GET = "GET";
+    private static final String METHOD_POST = "POST";
 
-    public static String get(String urlStr, Map<String, String> params, int connectTimeout, int readTimeout)
-            throws Exception {
-        if (urlStr == null) {
-            return null;
+    private static final int CONNECT_TIME_OUT = 1000 * 5;
+    private static final int READ_TIME_OUT = 1000 * 5;
+
+    private static final String CHARTSET = "UTF-8";
+    private static final int HTTP_OK = 200;
+    private static final int BUFFER = 1024 * 8;
+
+    private HttpUtils() {
+    }
+
+    public static String postJson(String urlStr, Map<String, String> headers, byte[] body) throws Exception {
+        Log.d(TAG, "http postJson: " + urlStr + "; headers: " + headers);
+        if (TextUtils.isEmpty(urlStr) || body == null || body.length == 0) {
+            return "url or body is null";
         }
-        StringBuilder fullUrlBuilder = new StringBuilder(urlStr);
-        if (params != null) {
-            String paramStr = parameters2String(params);
-            if (paramStr != null && !paramStr.equals("")) {
-                fullUrlBuilder.append("?").append(paramStr);
+
+        URL url = null;
+        HttpURLConnection conn = null;
+        InputStream inStream = null;
+        DataOutputStream outputStream = null;
+        String response = null;
+
+        try {
+            url = new URL(urlStr);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod(METHOD_POST);
+            conn.setConnectTimeout(CONNECT_TIME_OUT);
+            conn.setReadTimeout(READ_TIME_OUT);
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setUseCaches(false);
+            conn.setRequestProperty("Connection", "Keep-Alive");
+            conn.setRequestProperty("Charset", CHARTSET);
+            conn.setRequestProperty("Content-Length", String.valueOf(body.length));
+            conn.setRequestProperty("Content-Type", "application/json");
+            if (headers != null) {
+                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                    conn.setRequestProperty(entry.getKey(), entry.getValue());
+                }
+            }
+            conn.connect();
+
+            outputStream = new DataOutputStream(conn.getOutputStream());
+            outputStream.write(body);
+            outputStream.flush();
+            int responseCode = conn.getResponseCode();
+            if (responseCode == HTTP_OK) {
+                inStream = conn.getInputStream();
+            } else {
+                inStream = conn.getErrorStream();
+            }
+            response = getResponse(inStream);
+        } finally {
+            try {
+                if (inStream != null) {
+                    inStream.close();
+                }
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+                if (conn != null) {
+                    conn.disconnect();
+                }
+            } catch (Exception e) {
             }
         }
-        
+        return response;
+    }
+
+    public static String postFile(String urlStr, Map<String, String> headers, Map<String, String> params, File file) throws Exception {
+        Log.d(TAG, "http postFile:" + urlStr + "; file:" + file + "; parms:" + params);
+        if (TextUtils.isEmpty(urlStr) || file == null || !file.exists() || file.isDirectory()) {
+            return "url is empty or file is not valid";
+        }
+
+        String BOUNDARY = java.util.UUID.randomUUID().toString();
+        String PREFIX = "--";
+        String LINEND = "\r\n";
+        String MULTIPART_FORM_DATA = "multipart/form-data";
+        String CHARSET = "UTF-8";
+
         HttpURLConnection conn = null;
+        DataOutputStream outStream = null;
         InputStream inStream = null;
         int responseCode;
         String response = null;
+
         try {
-            URI uri = new URI(fullUrlBuilder.toString());
+            URI uri = new URI(urlStr);
             URL url = new URL(uri.toString());
             conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(CONNECT_TIME_OUT);
+            conn.setReadTimeout(READ_TIME_OUT);
             conn.setDoInput(true);
-            conn.setConnectTimeout(1000 * connectTimeout);
-            conn.setReadTimeout(1000 * readTimeout);
-            conn.setRequestMethod("GET");
+            conn.setDoOutput(true);
+            conn.setUseCaches(false);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("connection", "keep-alive");
+            conn.setRequestProperty("Charset", "UTF-8");
+            conn.setRequestProperty("Content-Type", MULTIPART_FORM_DATA + ";boundary=" + BOUNDARY);
+            if (headers != null) {
+                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                    conn.setRequestProperty(entry.getKey(), entry.getValue());
+                }
+            }
+            conn.connect();
+
+            // 发送参数
+            if (params != null) {
+                StringBuilder stringBuilder1 = new StringBuilder();
+                for (Map.Entry<String, String> entry : params.entrySet()) {
+                    stringBuilder1.append(PREFIX);
+                    stringBuilder1.append(BOUNDARY);
+                    stringBuilder1.append(LINEND);
+                    stringBuilder1.append("Content-Disposition: form-data; name=\"" + entry.getKey()
+                            + "\"" + LINEND);
+                    stringBuilder1.append("Content-Type: text/plain; charset=" + CHARSET + LINEND);
+                    stringBuilder1.append("Content-Transfer-Encoding: 8bit" + LINEND);
+                    stringBuilder1.append(LINEND);
+                    stringBuilder1.append(entry.getValue());
+                    stringBuilder1.append(LINEND);
+                }
+
+                outStream = new DataOutputStream(conn.getOutputStream());
+                outStream.write(stringBuilder1.toString().getBytes());
+            }
+
+            // 发送文件
+            if (outStream == null) {
+                outStream = new DataOutputStream(conn.getOutputStream());
+            }
+            StringBuilder stringBuilder2 = new StringBuilder();
+            stringBuilder2.append(PREFIX);
+            stringBuilder2.append(BOUNDARY);
+            stringBuilder2.append(LINEND);
+            stringBuilder2.append("Content-Disposition: form-data; name=\"file\"; filename=\""
+                    + file.getName() + "\"" + LINEND);
+            stringBuilder2.append("Content-Type: application/octet-stream; charset=" + CHARSET + LINEND);
+            stringBuilder2.append(LINEND);
+            outStream.write(stringBuilder2.toString().getBytes());
+
+            // 二进制数据
+            InputStream is = new FileInputStream(file);
+            byte[] buffer = new byte[1024];
+            int len = 0;
+            while ((len = is.read(buffer)) != -1) {
+                outStream.write(buffer, 0, len);
+            }
+            is.close();
+            outStream.write(LINEND.getBytes());
+
+            // 请求结束标志
+            byte[] end_data = (PREFIX + BOUNDARY + PREFIX + LINEND).getBytes();
+            outStream.write(end_data);
+            outStream.flush();
+
+            responseCode = conn.getResponseCode();
+            if (responseCode == HTTP_OK) {
+                inStream = conn.getInputStream();
+            } else {
+                inStream = conn.getErrorStream();
+            }
+            response = getResponse(inStream);
+        } finally {
+            if (outStream != null) {
+                outStream.close();
+            }
+            if (inStream != null) {
+                inStream.close();
+            }
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+
+        return response;
+    }
+
+    public static String postImageBytes(String urlStr, Map<String, String> headers, Map<String, String> params, byte[] imageData) throws Exception {
+        Log.d(TAG, "http postFile:" + urlStr + "; imageData:" + imageData + "; parms:" + params);
+        if (TextUtils.isEmpty(urlStr) || imageData == null || imageData.length == 0) {
+            return "url is empty or imageData is not valid";
+        }
+
+        String BOUNDARY = java.util.UUID.randomUUID().toString();
+        String PREFIX = "--";
+        String LINEND = "\r\n";
+        String MULTIPART_FORM_DATA = "multipart/form-data";
+        String CHARSET = "UTF-8";
+
+        HttpURLConnection conn = null;
+        DataOutputStream outStream = null;
+        InputStream inStream = null;
+        int responseCode;
+        String response = null;
+
+        try {
+            URI uri = new URI(urlStr);
+            URL url = new URL(uri.toString());
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(CONNECT_TIME_OUT);
+            conn.setReadTimeout(READ_TIME_OUT);
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+            conn.setUseCaches(false);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("connection", "keep-alive");
+            conn.setRequestProperty("Charset", "UTF-8");
+            conn.setRequestProperty("Content-Type", MULTIPART_FORM_DATA + ";boundary=" + BOUNDARY);
+            if (headers != null) {
+                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                    conn.setRequestProperty(entry.getKey(), entry.getValue());
+                }
+            }
+            conn.connect();
+
+            // 发送参数
+            if (params != null) {
+                StringBuilder stringBuilder1 = new StringBuilder();
+                for (Map.Entry<String, String> entry : params.entrySet()) {
+                    stringBuilder1.append(PREFIX);
+                    stringBuilder1.append(BOUNDARY);
+                    stringBuilder1.append(LINEND);
+                    stringBuilder1.append("Content-Disposition: form-data; name=\"" + entry.getKey()
+                            + "\"" + LINEND);
+                    stringBuilder1.append("Content-Type: text/plain; charset=" + CHARSET + LINEND);
+                    stringBuilder1.append("Content-Transfer-Encoding: 8bit" + LINEND);
+                    stringBuilder1.append(LINEND);
+                    stringBuilder1.append(entry.getValue());
+                    stringBuilder1.append(LINEND);
+                }
+
+                outStream = new DataOutputStream(conn.getOutputStream());
+                outStream.write(stringBuilder1.toString().getBytes());
+            }
+
+            // 发送 image bytes
+            if (outStream == null) {
+                outStream = new DataOutputStream(conn.getOutputStream());
+            }
+            StringBuilder stringBuilder2 = new StringBuilder();
+            stringBuilder2.append(PREFIX);
+            stringBuilder2.append(BOUNDARY);
+            stringBuilder2.append(LINEND);
+            stringBuilder2.append("Content-Disposition: form-data; name=\"file\"; filename=\"image\"" + LINEND);
+            stringBuilder2.append("Content-Type: application/octet-stream; charset=" + CHARSET + LINEND);
+            stringBuilder2.append(LINEND);
+            outStream.write(stringBuilder2.toString().getBytes());
+
+            // 二进制数据
+            outStream.write(imageData);
+            outStream.write(LINEND.getBytes());
+
+            // 请求结束标志
+            byte[] end_data = (PREFIX + BOUNDARY + PREFIX + LINEND).getBytes();
+            outStream.write(end_data);
+            outStream.flush();
+
+            responseCode = conn.getResponseCode();
+            if (responseCode == HTTP_OK) {
+                inStream = conn.getInputStream();
+            } else {
+                inStream = conn.getErrorStream();
+            }
+            response = getResponse(inStream);
+        } finally {
+            if (outStream != null) {
+                outStream.close();
+            }
+            if (inStream != null) {
+                inStream.close();
+            }
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+
+        return response;
+    }
+
+    public static boolean downloadFile(String urlStr, String saveDir, String fileName) {
+        Log.d(TAG, "http downloadFile:" + urlStr + "; save:" + saveDir + File.separator + fileName);
+        boolean result = false;
+
+        HttpURLConnection conn = null;
+        InputStream inStream = null;
+        FileOutputStream fos = null;
+
+        try {
+            File dir = new File(saveDir);
+            if (!dir.exists() || !dir.isDirectory()) {
+                dir.mkdirs();
+            }
+
+            File target = new File(saveDir, fileName);
+            if (target.exists() && target.isFile()) {
+                target.delete();
+            }
+
+            URL url = new URL(new URI(urlStr).toString());
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoInput(true);
+            conn.setConnectTimeout(CONNECT_TIME_OUT);
+            conn.setReadTimeout(READ_TIME_OUT);
+            conn.setRequestMethod(METHOD_GET);
             conn.setRequestProperty("accept", "*/*");
             conn.connect();
-            responseCode = conn.getResponseCode();
+
+            int responseCode = conn.getResponseCode();
             if (responseCode == HTTP_OK) {
                 inStream = conn.getInputStream();
-            } else {
-                inStream = conn.getErrorStream();
+                fos = new FileOutputStream(target);
+
+                long totalSize = conn.getContentLength();
+                long currentSize = 0;
+
+                byte buffer[] = new byte[BUFFER];
+                int readSize = 0;
+                while ((readSize = inStream.read(buffer)) > 0) {
+                    fos.write(buffer, 0, readSize);
+                    fos.flush();
+                    currentSize += readSize;
+                }
+
+                if (totalSize < 0 || currentSize == totalSize) {
+                    result = true;
+                }
             }
-            response = getResponse(inStream);
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
-            if (inStream != null)
-                inStream.close();
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-
-        System.out.println("http get...url=" + fullUrlBuilder.toString()
-        + ";\r\n" + "responseCode = " + responseCode
-        + ";\r\n" + "response=" + response);
-        return response;
-    }
-
-    public static String postForm(String actionUrl, Map<String, String> params, int connectTimeout, int readTimeout) throws Exception {
-        HttpURLConnection conn = null;
-        OutputStreamWriter outStream = null;
-        InputStream inStream = null;
-        int responseCode;
-        String response = null;
-
-        try {
-            URI uri = new URI(actionUrl);
-            URL url = new URL(uri.toString());
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(1000 * connectTimeout);
-            conn.setReadTimeout(1000 * readTimeout);
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
-            conn.setUseCaches(false);
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("connection", "keep-alive");
-            conn.setRequestProperty("Charset", "UTF-8");
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            conn.connect();
-
-            String paramStr = null;
-            if (params != null && (paramStr = parameters2String(params)) != null) {
-                outStream = new OutputStreamWriter(conn.getOutputStream(), "utf-8");
-                outStream.write(paramStr);
-                outStream.flush();
-            }
-
-            responseCode = conn.getResponseCode();
-            if (responseCode == HTTP_OK) {
-                inStream = conn.getInputStream();
-            } else {
-                inStream = conn.getErrorStream();
-            }
-            response = getResponse(inStream);
-        } finally {
-            if (outStream != null) {
-                outStream.close();
-            }
-            if (inStream != null) {
-                inStream.close();
-            }
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-
-        System.out.println("http post...url=" + actionUrl
-        + ";\r\n" + "responseCode = " + responseCode
-        + ";\r\n" + "response=" + response);
-        return response;
-    }
-    
-    public static String postJson(String actionUrl, String jsonStr, int connectTimeout, int readTimeout) throws Exception {
-        HttpURLConnection conn = null;
-        OutputStreamWriter outStream = null;
-        InputStream inStream = null;
-        int responseCode;
-        String response = null;
-
-        try {
-            URI uri = new URI(actionUrl);
-            URL url = new URL(uri.toString());
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(1000 * connectTimeout);
-            conn.setReadTimeout(1000 * readTimeout);
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
-            conn.setUseCaches(false);
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("connection", "keep-alive");
-            conn.setRequestProperty("Charset", "UTF-8");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.connect();
-
-            if (jsonStr != null) {
-                outStream = new OutputStreamWriter(conn.getOutputStream(), "utf-8");
-                outStream.write(jsonStr);
-                outStream.flush();
-            }
-
-            responseCode = conn.getResponseCode();
-            if (responseCode == HTTP_OK) {
-                inStream = conn.getInputStream();
-            } else {
-                inStream = conn.getErrorStream();
-            }
-            response = getResponse(inStream);
-        } finally {
-            if (outStream != null) {
-                outStream.close();
-            }
-            if (inStream != null) {
-                inStream.close();
-            }
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-        
-        System.out.println("http post...url=" + actionUrl
-                + ";\r\n" + "responseCode = " + responseCode
-                + ";\r\n" + "response=" + response);
-        return response;
-    }
-    
-    /**
-     * 通过拼接的方式构造请求内容，实现参数传输以及文件传输
-     * 
-     * @param actionUrl
-     *            访问的服务器URL
-     * @param params
-     *            普通参数
-     * @param files
-     *            文件参数
-     * @return
-     * @throws IOException
-     */
-    public static String postFile(String actionUrl, Map<String, String> params,
-            Map<String, File> files, int connectTimeout, int readTimeout) throws Exception {
-        String BOUNDARY = java.util.UUID.randomUUID().toString();
-        String PREFIX = "--";
-        String LINEND = "\r\n";
-        String MULTIPART_FORM_DATA = "multipart/form-data";
-        String CHARSET = "UTF-8";
-
-        HttpURLConnection conn = null;
-        DataOutputStream outStream = null;
-        InputStream inStream = null;
-        int responseCode;
-        String response = null;
-
-        try {
-            URI uri = new URI(actionUrl);
-            URL url = new URL(uri.toString());
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(1000 * connectTimeout);
-            conn.setReadTimeout(1000 * readTimeout);
-            conn.setDoInput(true);// 允许输入
-            conn.setDoOutput(true);// 允许输出
-            conn.setUseCaches(false); // 不允许使用缓存
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("connection", "keep-alive");
-            conn.setRequestProperty("Charset", "UTF-8");
-            conn.setRequestProperty("Content-Type", MULTIPART_FORM_DATA + ";boundary=" + BOUNDARY);
-            conn.connect();
-            
-            // 发送参数
-            if (params != null) {
-                StringBuilder stringBuilder1 = new StringBuilder();
-                for (Map.Entry<String, String> entry : params.entrySet()) {
-                    stringBuilder1.append(PREFIX);
-                    stringBuilder1.append(BOUNDARY);
-                    stringBuilder1.append(LINEND);
-                    stringBuilder1.append("Content-Disposition: form-data; name=\"" + entry.getKey()
-                            + "\"" + LINEND);
-                    stringBuilder1.append("Content-Type: text/plain; charset=" + CHARSET + LINEND);
-                    stringBuilder1.append("Content-Transfer-Encoding: 8bit" + LINEND);
-                    stringBuilder1.append(LINEND);
-                    stringBuilder1.append(entry.getValue());
-                    stringBuilder1.append(LINEND);
+            try {
+                if (fos != null) {
+                    fos.close();
                 }
-
-                outStream = new DataOutputStream(conn.getOutputStream());
-                outStream.write(stringBuilder1.toString().getBytes());
-            }
-
-            // 发送文件
-            if (files != null) {
-                if (outStream == null) {
-                    outStream = new DataOutputStream(conn.getOutputStream());
+                if (inStream != null) {
+                    inStream.close();
                 }
-                for (Map.Entry<String, File> file : files.entrySet()) {
-                    StringBuilder stringBuilder2 = new StringBuilder();
-                    stringBuilder2.append(PREFIX);
-                    stringBuilder2.append(BOUNDARY);
-                    stringBuilder2.append(LINEND);
-                    // TODO name是post中传参的键, filename是文件的名称
-                    stringBuilder2
-                            .append("Content-Disposition: form-data; name=\"" + file.getKey() + "\"; filename=\""
-                                    + file.getValue().getName() + "\"" + LINEND);
-                    stringBuilder2.append(
-                            "Content-Type: application/octet-stream; charset=" + CHARSET + LINEND);
-                    stringBuilder2.append(LINEND);
-                    outStream.write(stringBuilder2.toString().getBytes());
-
-                    InputStream is = new FileInputStream(file.getValue());
-                    byte[] buffer = new byte[1024];
-                    int len = 0;
-                    while ((len = is.read(buffer)) != -1) {
-                        outStream.write(buffer, 0, len);
-                    }
-                    is.close();
-                    outStream.write(LINEND.getBytes());
+                if (conn != null) {
+                    conn.disconnect();
                 }
-
-                // 请求结束标志
-                byte[] end_data = (PREFIX + BOUNDARY + PREFIX + LINEND).getBytes();
-                outStream.write(end_data);
-                outStream.flush();
-            }
-
-            responseCode = conn.getResponseCode();
-            if (responseCode == HTTP_OK) {
-                inStream = conn.getInputStream();
-            } else {
-                inStream = conn.getErrorStream();
-            }
-            response = getResponse(inStream);
-        } finally {
-            if (outStream != null) {
-                outStream.close();
-            }
-            if (inStream != null) {
-                inStream.close();
-            }
-            if (conn != null) {
-                conn.disconnect();
+            } catch (Exception e) {
             }
         }
 
-        System.out.println("http post...url=" + actionUrl
-                + ";\r\n" + "responseCode = " + responseCode
-                + ";\r\n" + "response=" + response);
-        return response;
-    }
-
-    /**
-     * 通过拼接的方式构造请求内容，实现参数传输以及文件传输
-     * 
-     * @param actionUrl
-     *            访问的服务器URL
-     * @param params
-     *            普通参数
-     * @param files
-     *            数据字节流
-     * @return
-     * @throws IOException
-     */
-    public static String postBytes(String actionUrl, Map<String, String> params,
-            Map<String, byte[]> files, int connectTimeout, int readTimeout) throws Exception {
-        String BOUNDARY = java.util.UUID.randomUUID().toString();
-        String PREFIX = "--";
-        String LINEND = "\r\n";
-        String MULTIPART_FORM_DATA = "multipart/form-data";
-        String CHARSET = "UTF-8";
-
-        HttpURLConnection conn = null;
-        DataOutputStream outStream = null;
-        InputStream inStream = null;
-        int responseCode;
-        String response = null;
-
-        try {
-            URI uri = new URI(actionUrl);
-            URL url = new URL(uri.toString());
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(1000 * connectTimeout);
-            conn.setReadTimeout(1000 * readTimeout);
-            conn.setDoInput(true);// 允许输入
-            conn.setDoOutput(true);// 允许输出
-            conn.setUseCaches(false); // 不允许使用缓存
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("connection", "keep-alive");
-            conn.setRequestProperty("Charset", "UTF-8");
-            conn.setRequestProperty("Content-Type", MULTIPART_FORM_DATA + ";boundary=" + BOUNDARY);
-
-            // 发送参数
-            if (params != null) {
-                StringBuilder stringBuilder1 = new StringBuilder();
-                for (Map.Entry<String, String> entry : params.entrySet()) {
-                    stringBuilder1.append(PREFIX);
-                    stringBuilder1.append(BOUNDARY);
-                    stringBuilder1.append(LINEND);
-                    stringBuilder1.append("Content-Disposition: form-data; name=\"" + entry.getKey()
-                            + "\"" + LINEND);
-                    stringBuilder1.append("Content-Type: text/plain; charset=" + CHARSET + LINEND);
-                    stringBuilder1.append("Content-Transfer-Encoding: 8bit" + LINEND);
-                    stringBuilder1.append(LINEND);
-                    stringBuilder1.append(entry.getValue());
-                    stringBuilder1.append(LINEND);
-                }
-
-                outStream = new DataOutputStream(conn.getOutputStream());
-                outStream.write(stringBuilder1.toString().getBytes());
-            }
-
-            // 发送文件
-            if (files != null) {
-                if (outStream == null) {
-                    outStream = new DataOutputStream(conn.getOutputStream());
-                }
-                for (Map.Entry<String, byte[]> file : files.entrySet()) {
-                    StringBuilder stringBuilder2 = new StringBuilder();
-                    stringBuilder2.append(PREFIX);
-                    stringBuilder2.append(BOUNDARY);
-                    stringBuilder2.append(LINEND);
-                    // TODO name是post中传参的键, filename是文件的名称
-                    stringBuilder2
-                            .append("Content-Disposition: form-data; name=\"file\"; filename=\""
-                                    + file.getKey() + "\"" + LINEND);
-                    stringBuilder2.append(
-                            "Content-Type: application/octet-stream; charset=" + CHARSET + LINEND);
-                    stringBuilder2.append(LINEND);
-                    outStream.write(stringBuilder2.toString().getBytes());
-
-                    outStream.write(file.getValue());
-                    outStream.write(LINEND.getBytes());
-                }
-
-                // 请求结束标志
-                byte[] end_data = (PREFIX + BOUNDARY + PREFIX + LINEND).getBytes();
-                outStream.write(end_data);
-                outStream.flush();
-            }
-
-            responseCode = conn.getResponseCode();
-            if (responseCode == HTTP_OK) {
-                inStream = conn.getInputStream();
-            } else {
-                inStream = conn.getErrorStream();
-            }
-            response = getResponse(inStream);
-        } finally {
-            if (outStream != null) {
-                outStream.close();
-            }
-            if (inStream != null) {
-                inStream.close();
-            }
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-
-        System.out.println("http post...url=" + actionUrl
-                + ";\r\n" + "responseCode = " + responseCode
-                + ";\r\n" + "response=" + response);
-        return response;
-    }
-
-    public static int postFileByApache(String urlStr, Map<String, String> paramsMap,
-            Map<String, File> filesMap, int connectTimeout, int soTimeout) throws Exception {
-        Log.d(TAG, "httpPostFiles...url = " + urlStr);
-        Log.d(TAG, "httpPostFiles...paramsMap = " + paramsMap);
-        if (TextUtils.isEmpty(urlStr) || paramsMap == null || filesMap == null) {
-            return -1;
-        }
-
-        String result = "unKnow result!";
-
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        httpclient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION,
-                HttpVersion.HTTP_1_1);
-        httpclient.getParams()
-                .setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connectTimeout);
-        httpclient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, soTimeout);
-
-        HttpPost httppost = new HttpPost(urlStr);
-        addStringHeader(paramsMap, httppost);
-        addFileEntity(filesMap, httppost);
-
-        HttpResponse response = httpclient.execute(httppost);
-        int statusCode = response.getStatusLine().getStatusCode();
-        HttpEntity resEntity = response.getEntity();
-        if (resEntity != null) {
-            result = EntityUtils.toString(resEntity, "utf-8");
-            resEntity.consumeContent();
-        }
-
-        httpclient.getConnectionManager().shutdown();
-
-        Log.d(TAG, result);
-        return statusCode;
-    }
-
-    private static void addStringHeader(Map<String, String> map, HttpPost httppost)
-            throws Exception {
-        Set<String> keySet = map.keySet();
-        for (Iterator<String> it = keySet.iterator(); it.hasNext();) {
-            String key = it.next();
-            String value = map.get(key);
-            httppost.addHeader(key, value);
-        }
-    }
-
-    private static void addFileEntity(Map<String, File> map, HttpPost httppost) throws Exception {
-        MultipartEntity mpEntity = new MultipartEntity();
-        Set<String> keySet = map.keySet();
-        for (Iterator<String> it = keySet.iterator(); it.hasNext();) {
-            String key = it.next();
-            File value = map.get(key);
-            ContentBody cbFile = new FileBody(value);
-            mpEntity.addPart("file", cbFile);
-        }
-        httppost.setEntity(mpEntity);
-    }
-
-    private static String parameters2String(Map<String, String> params) throws UnsupportedEncodingException{
-        if (params == null) {
-            return null;
-        }
-        StringBuilder paramsBuilder = new StringBuilder();
-        Iterator<Map.Entry<String, String>> entries = params.entrySet().iterator();
-        while (entries.hasNext()) {
-            Map.Entry<String, String> entry = entries.next();
-            paramsBuilder.append(encodeParameter(entry.getKey()));
-            paramsBuilder.append("=");
-            paramsBuilder.append(encodeParameter(entry.getValue()));
-            paramsBuilder.append("&");
-        }
-        String result = paramsBuilder.toString();
-        if (result != null && result.endsWith("&")) {
-            paramsBuilder.deleteCharAt(paramsBuilder.length() - 1);
-        }
         return result;
     }
 
-    private static String encodeParameter(String parameter) throws UnsupportedEncodingException {
-        if (parameter == null) {
+    /**
+     * GET方式发送请求
+     *
+     * @param urlStr 请求URL地址
+     * @param params 请求URL参数
+     * @return
+     * @throws Exception
+     */
+    public static String get(String urlStr, Map<String, String> params) throws Exception {
+        URL url = null;
+        HttpURLConnection conn = null;
+        InputStream inStream = null;
+        String response = null;
+
+        try {
+            url = transformUrl(urlStr, params);
+            Log.d(TAG, "http get:" + url);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoInput(true);
+            conn.setRequestMethod(METHOD_GET);
+            conn.setConnectTimeout(CONNECT_TIME_OUT);
+            conn.setReadTimeout(READ_TIME_OUT);
+            conn.setRequestProperty("accept", "*/*");
+            conn.connect();
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode == HTTP_OK) {
+                inStream = conn.getInputStream();
+            } else {
+                inStream = conn.getErrorStream();
+            }
+            response = getResponse(inStream);
+        } finally {
+            try {
+                if (inStream != null) {
+                    inStream.close();
+                }
+                if (conn != null) {
+                    conn.disconnect();
+                }
+            } catch (Exception e) {
+            }
+        }
+        return response;
+    }
+
+    /**
+     * POST方式发送数据
+     *
+     * @param urlStr 请求URL地址
+     * @param params 请求URL参数
+     * @param body   要post的数据body
+     * @return
+     * @throws Exception
+     */
+    public static String post(String urlStr, Map<String, String> params, String body) throws Exception {
+        URL url = null;
+        HttpURLConnection conn = null;
+        InputStream inStream = null;
+        DataOutputStream outputStream = null;
+        String response = null;
+        byte[] data = body.getBytes();
+
+        try {
+            url = transformUrl(urlStr, params);
+            Log.d(TAG, "http post:" + url);
+
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod(METHOD_POST);
+            conn.setConnectTimeout(CONNECT_TIME_OUT);
+            conn.setReadTimeout(READ_TIME_OUT);
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setUseCaches(false);
+            conn.setRequestProperty("Connection", "Keep-Alive");
+            conn.setRequestProperty("Charset", CHARTSET);
+            conn.setRequestProperty("Content-Length", String.valueOf(data.length));
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.connect();
+
+            outputStream = new DataOutputStream(conn.getOutputStream());
+            outputStream.write(data);
+            outputStream.flush();
+            int responseCode = conn.getResponseCode();
+            if (responseCode == HTTP_OK) {
+                inStream = conn.getInputStream();
+            } else {
+                inStream = conn.getErrorStream();
+            }
+            response = getResponse(inStream);
+        } finally {
+            try {
+                if (inStream != null) {
+                    inStream.close();
+                }
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+                if (conn != null) {
+                    conn.disconnect();
+                }
+            } catch (Exception e) {
+            }
+        }
+        return response;
+    }
+
+    private static URL transformUrl(String urlStr, Map<String, String> params) throws MalformedURLException {
+        HashMap<String, String> map = new HashMap<>();
+        URI uri = URI.create(urlStr);
+        String query = uri.getQuery();
+        String url = urlStr;
+
+        // split internal params in the url
+        if (query != null) {
+            url = url.replaceAll("\\?" + query, "");
+            String[] queryParams = query.split("\\&");
+            for (int i = 0; i < queryParams.length; i++) {
+                String[] pair = queryParams[i].split("=");
+                if (pair.length == 2) {
+                    map.put(pair[0], pair[1]);
+                }
+            }
+        }
+
+        // add external params
+        if (params != null) {
+            map.putAll(params);
+        }
+
+        // encode params
+        StringBuffer paramBuilder = new StringBuffer();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            paramBuilder.append(entry.getKey());
+            paramBuilder.append("=");
+            paramBuilder.append(encode(entry.getValue()));
+            paramBuilder.append("&");
+        }
+
+        // append params
+        String paramStr = paramBuilder.toString();
+        if (!TextUtils.isEmpty(paramStr)) {
+            url = url + "?" + paramStr.substring(0, paramStr.length() - 1);
+        }
+
+        return new URL(url);
+    }
+
+    private static String encode(String s) {
+        if (s == null) {
             return "";
         }
-        String encoded = URLEncoder.encode(parameter, "UTF-8");
+        String encoded = "";
+        try {
+            encoded = URLEncoder.encode(s, CHARTSET);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
         StringBuilder sBuilder = new StringBuilder();
         for (int i = 0; i < encoded.length(); i++) {
             char c = encoded.charAt(i);
             if (c == '+') {
                 sBuilder.append("%20");
+            } else if ((c == '%') && ((i + 1) < encoded.length()) && ((i + 2) < encoded.length()) & (encoded.charAt(i + 1) == '7') && (encoded.charAt(i + 2) == 'E')) {
+                sBuilder.append("~");
+                i += 2;
             } else {
                 sBuilder.append(c);
             }
@@ -520,19 +546,24 @@ public class HttpUtils {
         return sBuilder.toString();
     }
 
-    private static String getResponse(InputStream inStream) {
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            int len = -1;
-            byte[] buffer = new byte[1024 * 8];
-            while ((len = inStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, len);
-            }
-            byte[] data = outputStream.toByteArray();
-            return new String(data);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "getResponse error!";
+    /**
+     * 获取输入流中信息
+     *
+     * @param inStream 输入流
+     * @return
+     * @throws IOException
+     */
+    private static String getResponse(InputStream inStream) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        int len = -1;
+        byte[] buffer = new byte[BUFFER];
+        while ((len = inStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, len);
         }
+        inStream.close();
+        byte[] data = outputStream.toByteArray();
+        outputStream.close();
+        return new String(data);
     }
+
 }

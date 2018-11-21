@@ -1,32 +1,5 @@
 package com.wtz.tools.network;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.http.conn.routing.RouteInfo;
-
-import com.wtz.tools.ShellUtils;
-import com.wtz.tools.ShellUtils.CommandResult;
-
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
@@ -34,43 +7,283 @@ import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.provider.Settings;
 import android.text.TextUtils;
-import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.URLEncoder;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class NetworkDeviceUtils {
 
     private static final String TAG = NetworkDeviceUtils.class.getName();
 
-    public static boolean isNetConnected(Context cxt) {
-        if (cxt == null) {
-            Log.d(TAG, "isNetConnected: Context is null");
-            return false;
+    public static boolean isNetworkConnect(Context context) {
+        ConnectivityManager connectivity = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo info = connectivity.getActiveNetworkInfo();
+            return info != null && info.isAvailable();
         }
 
-        ConnectivityManager connectivity = (ConnectivityManager) cxt
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        return false;
+    }
 
+    public static String getWlan0Mac(Context context) {
+        String mac = null;
+        if (context != null) {
+            WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            if (wifiInfo != null) {
+                mac = wifiInfo.getMacAddress();
+            }
+        }
+        if (TextUtils.isEmpty(mac) || mac.equals("02:00:00:00:00:00")) {
+            mac = getLocalMac("wlan0");
+        }
+        if (TextUtils.isEmpty(mac) || mac.equals("02:00:00:00:00:00")) {
+            mac = readDevMac("/sys/class/net/wlan0/address");
+        }
+        return mac;
+    }
+
+    public static String getEth0Mac() {
+        String mac = getLocalMac("eth0");
+        if (TextUtils.isEmpty(mac)) {
+            mac = readDevMac("/sys/class/net/eth0/address");
+        }
+        return mac;
+    }
+
+    private static String getLocalMac(String name) {
+        String mac = "";
+
+        try {
+            NetworkInterface ni = NetworkInterface.getByName(name);
+            byte[] address = ni.getHardwareAddress();
+            StringBuffer sb = new StringBuffer();
+            if (address != null && address.length == 6) {
+                sb.append(parseByteToHex(address[0])).append(":").append(
+                        parseByteToHex(address[1])).append(":").append(
+                        parseByteToHex(address[2])).append(":").append(
+                        parseByteToHex(address[3])).append(":").append(
+                        parseByteToHex(address[4])).append(":").append(
+                        parseByteToHex(address[5]));
+                mac = sb.toString();
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return mac;
+    }
+
+    private static String parseByteToHex(byte b) {
+        // 把0写成00
+        String s = "00" + Integer.toHexString(b);
+        return s.substring(s.length() - 2);
+    }
+
+    private static String readDevMac(final String path) {
+        FileInputStream fis = null;
+        InputStreamReader isr = null;
+        BufferedReader br = null;
+        String devMac = "";
+        try {
+            fis = new FileInputStream(new File(path));
+            isr = new InputStreamReader(fis);
+            br = new BufferedReader(isr);
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(br.readLine());
+            devMac = buffer.toString().trim();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (br != null) {
+                    br.close();
+                }
+                if (isr != null) {
+                    isr.close();
+                }
+                if (fis != null) {
+                    fis.close();
+                }
+            } catch (IOException e) {
+            }
+        }
+        return devMac;
+    }
+
+    public static JSONArray getWiFiNearbyList(Context context) {
+        JSONArray jsonArray = new JSONArray();
+        TreeSet<String> wifiNearby = getWiFiNearby(context);
+        if (wifiNearby != null && wifiNearby.size() > 0) {
+            for (String wifi : wifiNearby) {
+                try {
+                    String[] temp = wifi.split("_");
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("ssid", URLEncoder.encode(temp[0], "UTF-8"));
+                    jsonObject.put("bssid", temp[1]);
+                    jsonArray.put(jsonObject);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return jsonArray;
+    }
+
+    public static TreeSet<String> getWiFiNearby(Context context) {
+        if (context != null && isWiFiActive(context)) {
+            TreeSet<String> wifiInfoSet = new TreeSet<String>();
+            WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            List<ScanResult> scanResults = wifiManager.getScanResults();// 搜索到的设备列表
+            int count = 0;
+            while (scanResults.size() == 0 && count < 5) {
+                scanResults = wifiManager.getScanResults();
+                count++;
+            }
+            for (ScanResult scanResult : scanResults) {
+                wifiInfoSet.add(scanResult.SSID + "_" + scanResult.BSSID);
+            }
+            return wifiInfoSet;
+        }
+        return null;
+    }
+
+    public static List<ScanResult> getWiFiNearbyResults(Context context) {
+        if (context != null && isWiFiActive(context)) {
+            WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            List<ScanResult> scanResults = wifiManager.getScanResults();
+            int count = 0;
+            while (scanResults.size() == 0 && count < 5) {
+                scanResults = wifiManager.getScanResults();
+                count++;
+            }
+            return scanResults;
+        }
+        return null;
+    }
+
+    public static boolean isWiFiActive(Context context) {
+        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity != null) {
-            NetworkInfo[] info = connectivity.getAllNetworkInfo();
-
-            if (info != null) {
-                for (int i = 0; i < info.length; i++) {
-                    if (info[i].getState() == NetworkInfo.State.CONNECTED) {
-                        Log.d(TAG, "isNetConnected: true");
+            NetworkInfo[] infos = connectivity.getAllNetworkInfo();
+            if (infos != null) {
+                for (NetworkInfo ni : infos) {
+                    if (ni.getTypeName().equals("WIFI") && ni.isConnected()) {
                         return true;
                     }
                 }
             }
         }
-
-        Log.d(TAG, "isNetConnected: false");
         return false;
     }
-    
+
+    public static String getSSID(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        if (wifiInfo != null && wifiInfo.getSSID() != null) {
+            return wifiInfo.getSSID();
+        }
+
+        List<ScanResult> list = wifiManager.getScanResults();
+        if (null == list) {
+            return null;
+        }
+        int len = list.size();
+        int index = -1;
+        int maxLevel = -10000;
+        for (int i = 0; i < len; i++) {
+            ScanResult result = list.get(i);
+            if (null != result && result.level > maxLevel) {
+                index = i;
+                maxLevel = result.level;
+            }
+        }
+
+        if (index >= 0) {
+            return list.get(index).SSID;
+        }
+
+        return null;
+    }
+
+    public static String getConnectedBSSID(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        if (wifiInfo != null && wifiInfo.getBSSID() != null
+                && !wifiInfo.getBSSID().equals("00:00:00:00:00:00")) {
+            return wifiInfo.getBSSID();
+        }
+        return "";
+    }
+
+    public static String getBSSID(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        if (wifiInfo != null && wifiInfo.getBSSID() != null
+                && !wifiInfo.getBSSID().equals("00:00:00:00:00:00")) {
+            return wifiInfo.getBSSID();
+        } else {
+            List<ScanResult> list = wifiManager.getScanResults();
+            int len = list.size();
+            int index = -1;
+            int maxLevel = -10000;
+            for (int i = 0; i < len; i++) {
+                ScanResult result = list.get(i);
+                if (result.level > maxLevel) {
+                    index = i;
+                    maxLevel = result.level;
+                }
+            }
+
+            if (index >= 0) {
+                return list.get(index).BSSID;
+            } else {
+                return null;
+            }
+        }
+    }
+
     public static Map<String, String> getNetworkInfo(Context context) {
-        String mac = "";
+        if (context == null) {
+            return null;
+        }
+
         String ip = "";
+        String net_type = "";
         String mask = "";
         String gateway = "";
         String dns1 = "";
@@ -79,14 +292,12 @@ public class NetworkDeviceUtils {
         String bssid = "";
         Map<String, String> results = new HashMap<String, String>();
 
-        ConnectivityManager cm = (ConnectivityManager) context.getApplicationContext()
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo connectedInfo = null;
         if (cm != null) {
             NetworkInfo[] infos = cm.getAllNetworkInfo();
             for (NetworkInfo ni : infos) {
                 if (ni.getState() == NetworkInfo.State.CONNECTED) {
-                    Log.d(TAG, "find connected info, type is " + ni.getTypeName());
                     connectedInfo = ni;
                     break;
                 }
@@ -97,10 +308,10 @@ public class NetworkDeviceUtils {
             // 已连接
             switch (connectedInfo.getType()) {
                 case ConnectivityManager.TYPE_WIFI:
+                    net_type = "wifi";
                     WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
                     WifiInfo wifiInfo = wifiManager.getConnectionInfo();
                     if (wifiInfo != null) {
-                        mac = wifiInfo.getMacAddress();
                         ip = int2ip(wifiInfo.getIpAddress());
                         ssid = wifiInfo.getSSID();
                         bssid = wifiInfo.getBSSID();
@@ -111,10 +322,6 @@ public class NetworkDeviceUtils {
                             dns1 = int2ip(di.dns1);
                             dns2 = int2ip(di.dns2);
                         }
-                    }
-
-                    if (TextUtils.isEmpty(mac) || mac.contains("00:00:00:00")) {
-                        mac = readDevMacFromWlan0();
                     }
                     if (TextUtils.isEmpty(ip) || !isIpString(ip)) {
                         ip = androidGetProp("dhcp.wlan0.ipaddress", "");
@@ -133,21 +340,22 @@ public class NetworkDeviceUtils {
                     }
                     break;
                 case ConnectivityManager.TYPE_ETHERNET:
+                    net_type = "ethernet";
                     try {
                         for (Enumeration<NetworkInterface> en = NetworkInterface
                                 .getNetworkInterfaces(); en.hasMoreElements(); ) {
-                            NetworkInterface netInterface = en.nextElement();
-                            List<InterfaceAddress> mList = netInterface.getInterfaceAddresses();
-                            for (InterfaceAddress interfaceAddress : mList) {
-                                InetAddress inetAddress = interfaceAddress.getAddress();
-                                if (!inetAddress.isLoopbackAddress()) {
-                                    String hostAddress = inetAddress.getHostAddress();
-                                    Log.d(TAG, "inetAddress.getHostAddress = " + hostAddress);
-                                    if (!hostAddress.contains("::")) {
-                                        mac = getMacByInetAddress(inetAddress);
-                                        ip = hostAddress;
-                                        mask = calcMaskByPrefixLength(interfaceAddress
-                                                .getNetworkPrefixLength());
+                            {
+                                NetworkInterface netInterface = en.nextElement();
+                                List<InterfaceAddress> mList = netInterface.getInterfaceAddresses();
+                                for (InterfaceAddress interfaceAddress : mList) {
+                                    InetAddress inetAddress = interfaceAddress.getAddress();
+                                    if (!inetAddress.isLoopbackAddress()) {
+                                        String hostAddress = inetAddress.getHostAddress();
+                                        if (!hostAddress.contains("::")) {
+                                            ip = hostAddress;
+                                            mask = calcMaskByPrefixLength(interfaceAddress
+                                                    .getNetworkPrefixLength());
+                                        }
                                     }
                                 }
                             }
@@ -168,16 +376,8 @@ public class NetworkDeviceUtils {
                         Class<?> classLinkp = Class.forName("android.net.LinkProperties");
                         Method methodGetRoutes = classLinkp.getDeclaredMethod("getRoutes");
                         Method methodGetDnses = classLinkp.getDeclaredMethod("getDnses");
-                        Collection<RouteInfo> routeInfos = (Collection<RouteInfo>) methodGetRoutes.invoke(linkProperties);
-                        Collection<InetAddress> inetAddresses = (Collection<InetAddress>) methodGetDnses.invoke(linkProperties);
 
-                        String routeInfoString = routeInfos.toString();
-                        if (routeInfoString.contains(">")) {
-                            gateway = routeInfoString.substring(
-                                    routeInfoString.lastIndexOf('>') + 2,
-                                    routeInfoString.length() - 1);
-                            Log.d(TAG, "get gateway form routeInfoString: " + gateway);
-                        }
+                        Collection<InetAddress> inetAddresses = (Collection<InetAddress>) methodGetDnses.invoke(linkProperties);
 
                         String inetAddressString = inetAddresses.toString();
                         if (inetAddressString.contains(",")) {
@@ -186,14 +386,19 @@ public class NetworkDeviceUtils {
                             dns2 = inetAddressString.substring(
                                     inetAddressString.lastIndexOf(",") + 3,
                                     inetAddressString.length() - 1);
-                            Log.d(TAG, "get dns form inetAddressString: " + dns1 + ", " + dns2);
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
 
-                    if (TextUtils.isEmpty(mac) || mac.contains("00:00:00:00")) {
-                        mac = readDevMacFromEth0();
+                        Collection<Object> routeInfos = (Collection<Object>) methodGetRoutes.invoke(linkProperties);
+                        String routeInfoString = routeInfos.toString();
+                        if (routeInfoString.contains(">")) {
+                            gateway = routeInfoString.substring(
+                                    routeInfoString.lastIndexOf('>') + 2,
+                                    routeInfoString.length() - 1);
+                        }
+                    } catch (NoSuchFieldError e) {
+                    } catch (NoSuchMethodError e) {
+                    } catch (IllegalAccessError e) {
+                    } catch (Exception e) {
                     }
                     if (TextUtils.isEmpty(ip) || !isIpString(ip)) {
                         ip = androidGetProp("dhcp.eth0.ipaddress", "");
@@ -203,9 +408,6 @@ public class NetworkDeviceUtils {
                     }
                     if (TextUtils.isEmpty(gateway)) {
                         gateway = androidGetProp("dhcp.eth0.gateway", "");
-                        if (TextUtils.isEmpty(gateway)) {
-                            gateway = getEth0GatewayByCmd();
-                        }
                     }
                     if (TextUtils.isEmpty(dns1)) {
                         dns1 = androidGetProp("dhcp.eth0.dns1", "");
@@ -216,14 +418,15 @@ public class NetworkDeviceUtils {
 
                     break;
                 case ConnectivityManager.TYPE_MOBILE:
-                    // TODO: 2017/9/20
+                    net_type = "mobile";
                     break;
                 default:
+                    net_type = "unknown";
                     break;
             }
         }
 
-        results.put("mac", mac);
+        results.put("net_type", net_type);
         results.put("ip", ip);
         results.put("mask", mask);
         results.put("gateway", gateway);
@@ -232,49 +435,6 @@ public class NetworkDeviceUtils {
         results.put("ssid", ssid);
         results.put("bssid", bssid);
         return results;
-    }
-
-    private static String getMacByInetAddress(InetAddress inetAddress) {
-        StringBuffer buffer = null;
-        byte[] bytes = null;
-
-        try {
-            bytes = NetworkInterface.getByInetAddress(inetAddress)
-                    .getHardwareAddress();
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-
-        if (bytes != null && bytes.length > 0) {
-            buffer = new StringBuffer();
-            for (int i = 0; i < bytes.length; i++) {
-                if (i != 0) {
-                    buffer.append(':');
-                }
-                String str = Integer.toHexString(bytes[i] & 0xFF);
-                buffer.append(str.length() == 1 ? 0 + str : str);
-            }
-        }
-
-        return (buffer != null) ? buffer.toString().toLowerCase() : null;
-    }
-
-    private static String getEth0GatewayByCmd() {
-        String gateWay = null;
-        String prefix = "default via ";
-        String suffix = " dev eth0";
-        String cmd = "ip route show | grep \"default via\" | grep \"dev eth0\"";
-        ShellUtils.CommandResult ret = ShellUtils.execCommand(cmd, false);
-        Log.d(TAG, ret.toString());
-        if (!TextUtils.isEmpty(ret.successMsg)) {
-            int start = ret.successMsg.indexOf(prefix);
-            int end = ret.successMsg.indexOf(suffix);
-            if (start != -1 && end != -1) {
-                start = start + prefix.length();
-                gateWay = ret.successMsg.substring(start, end);
-            }
-        }
-        return gateWay;
     }
 
     private static String calcMaskByPrefixLength(int length) {
@@ -296,7 +456,6 @@ public class NetworkDeviceUtils {
         for (int i = 1; i < maskParts.length; i++) {
             result = result + "." + maskParts[i];
         }
-        Log.d(TAG, "calcMaskByPrefixLength: " + result);
         return result;
     }
 
@@ -312,20 +471,7 @@ public class NetworkDeviceUtils {
         return sb.toString();
     }
 
-    public static String androidGetProp(String key, String defaultValue) {
-        String value = defaultValue;
-        try {
-            Class<?> c = Class.forName("android.os.SystemProperties");
-            Method get = c.getMethod("get", String.class, String.class);
-            value = (String) (get.invoke(c, key, ""));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Log.d(TAG, "get property, " + key + " = " + value);
-        return value;
-    }
-
-    private static boolean isIpString(String target) {
+    public static boolean isIpString(String target) {
         String regex = "^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\."
                 + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
                 + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
@@ -342,63 +488,68 @@ public class NetworkDeviceUtils {
         return matcher.matches();
     }
 
-    private static String readDevMacFromEth0() {
-        final String path = "/sys/class/net/eth0/address";
-        return readDevMac(path);
-    }
-
-    private static String readDevMacFromWlan0() {
-        final String path = "/sys/class/net/wlan0/address";
-        return readDevMac(path);
-    }
-
-    private static String readDevMac(final String path) {
-
-        FileInputStream fis = null;
-        InputStreamReader isr = null;
+    public static String getGatewayMac(String gatewayIp) {
+        if (TextUtils.isEmpty(gatewayIp)) {
+            return "";
+        }
         BufferedReader br = null;
-        String devMac = "";
         try {
-            fis = new FileInputStream(new File(path));
-            isr = new InputStreamReader(fis);
-            br = new BufferedReader(isr);
-            StringBuffer buffer = new StringBuffer();
-            buffer.append(br.readLine());
-            devMac = buffer.toString().trim();
-            Log.d(TAG, "read mac from " + path + "-" + devMac);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            br = new BufferedReader(new FileReader("/proc/net/arp"));
+            String line = "";
+            String ip = "";
+            String flag = "";
+            String mac = "";
+
+            while ((line = br.readLine()) != null) {
+                try {
+                    line = line.trim();
+                    if (line.length() < 63) continue;
+                    if (line.toUpperCase(Locale.US).contains("IP")) continue;
+                    ip = line.substring(0, 17).trim();
+                    flag = line.substring(29, 32).trim();
+                    mac = line.substring(41, 63).trim();
+                    if (mac.contains("00:00:00:00:00:00")) continue;
+                    if (ip.contains(gatewayIp)) {
+                        return mac;
+                    }
+                } catch (Exception e) {
+                }
+            }
+        } catch (Exception e) {
         } finally {
-            try {
-                if (br != null) {
+            if (br != null) {
+                try {
                     br.close();
+                } catch (IOException e) {
                 }
-                if (isr != null) {
-                    isr.close();
-                }
-                if (fis != null) {
-                    fis.close();
-                }
-            } catch (IOException e) {
-                // just ignore
-                e.printStackTrace();
             }
         }
-        return devMac;
+        return "";
     }
+
+    public static String androidGetProp(String key, String defaultValue) {
+        String value = defaultValue;
+        try {
+            Class<?> c = Class.forName("android.os.SystemProperties");
+            Method get = c.getMethod("get", String.class, String.class);
+            value = (String) (get.invoke(c, key, ""));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return value;
+    }
+    //================================
 
     public static String getLocalIPAddress() {
         String ipAddress = null;
         try {
             for (Enumeration mEnumeration = NetworkInterface.getNetworkInterfaces(); mEnumeration
-                    .hasMoreElements();) {
+                    .hasMoreElements(); ) {
                 NetworkInterface netInterface = (NetworkInterface) mEnumeration.nextElement();
                 if (netInterface.getName().toLowerCase().equals("eth0")
                         || netInterface.getName().toLowerCase().equals("wlan0")) {
                     for (Enumeration enumIPAddr = netInterface.getInetAddresses(); enumIPAddr
-                            .hasMoreElements();) {
+                            .hasMoreElements(); ) {
                         InetAddress inetAddress = (InetAddress) enumIPAddr.nextElement();
                         // 如果不是回环地址
                         if (!inetAddress.isLoopbackAddress()) {
@@ -417,7 +568,7 @@ public class NetworkDeviceUtils {
 
         return null;
     }
-    
+
     public static Map<String, String> readArp() {
         BufferedReader br = null;
         Map<String, String> devices = null;
@@ -457,77 +608,6 @@ public class NetworkDeviceUtils {
         }
 
         return devices;
-    }
-
-    public static String getBSSID(Context context) {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        if (wifiInfo != null && wifiInfo.getBSSID() != null
-                && !wifiInfo.getBSSID().equals("00:00:00:00:00:00")) {
-            return wifiInfo.getBSSID();
-        } else {
-            List<ScanResult> list = wifiManager.getScanResults();
-            int len = list.size();
-            int index = -1;
-            int maxLevel = -10000;
-            for (int i = 0; i < len; i++) {
-                ScanResult result = list.get(i);
-                if (result.level > maxLevel) {
-                    index = i;
-                    maxLevel = result.level;
-                }
-            }
-
-            if (index >= 0) {
-                return list.get(index).BSSID;
-            } else {
-                return null;
-            }
-        }
-    }
-
-    public static String getSSID(Context context) {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        if (wifiInfo != null && wifiInfo.getSSID() != null) {
-            return wifiInfo.getSSID();
-        }
-
-        List<ScanResult> list = wifiManager.getScanResults();
-        if (null == list) {
-            return null;
-        }
-        int len = list.size();
-        int index = -1;
-        int maxLevel = -10000;
-        for (int i = 0; i < len; i++) {
-            ScanResult result = list.get(i);
-            if (null != result && result.level > maxLevel) {
-                index = i;
-                maxLevel = result.level;
-            }
-        }
-
-        if (index >= 0) {
-            return list.get(index).SSID;
-        }
-
-        return null;
-    }
-
-    /**
-     * @param context
-     * @return ANDROID_ID
-     */
-    public static String getAndroidID(Context context) {
-        try {
-            return Settings.System.getString(context.getContentResolver(),
-                    Settings.System.ANDROID_ID);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 
 }

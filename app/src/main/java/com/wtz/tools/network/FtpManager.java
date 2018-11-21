@@ -50,7 +50,7 @@ public class FtpManager {
     public boolean upload(Context context, File file, String targetPath, int maxRetryNum) {
         for (int i = 0; i < maxRetryNum; i++) {
             Log.d(TAG, "uploadByFtp...for i = " + i + ", target file: " + file);
-            if (!NetworkDeviceUtils.isNetConnected(context)) {
+            if (!NetworkDeviceUtils.isNetworkConnect(context)) {
                 String log = "uploadByFtp...net is not connected! for i = " + i + ", target file: "
                         + file;
                 Log.d(TAG, log);

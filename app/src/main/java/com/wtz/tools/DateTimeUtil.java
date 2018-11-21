@@ -1,6 +1,7 @@
 package com.wtz.tools;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -197,4 +198,20 @@ public class DateTimeUtil {
         }
         return convertSuccess;
     }
+
+    public static boolean isYeaterday(Date oldTime, Date newTime) throws ParseException {
+        if (newTime == null) {
+            newTime = new Date();
+        }
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String oldStr = format.format(oldTime);
+        String todayStr = format.format(newTime);
+        Date oldDay = format.parse(oldStr);
+        Date today = format.parse(todayStr);
+        if ((today.getTime() - oldDay.getTime()) > 0) {
+            return true;
+        }
+        return false;
+    }
+
 }

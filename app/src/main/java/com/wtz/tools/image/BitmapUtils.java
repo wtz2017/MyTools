@@ -232,6 +232,25 @@ public class BitmapUtils {
         return scaled;
     }
 
+    /**
+     * 把图片缩小到指定大小范围内
+     * @return
+     */
+    public static Bitmap scaleIntoSizeRange(Bitmap srcBitmap, int maxWidth, int maxHeight) {
+        Bitmap bitmap = null;
+        int w = srcBitmap.getWidth();
+        int h = srcBitmap.getHeight();
+        if (w > maxWidth || h > maxHeight) {
+            float sw = w / (float) maxWidth;
+            float sh = h / (float) maxHeight;
+            float scale = sw > sh ? sw : sh;
+            int destW = (int) (w / scale);
+            int destH = (int) (h / scale);
+            bitmap = Bitmap.createScaledBitmap(bitmap, destW, destH, true);
+        }
+        return bitmap;
+    }
+
     public static Bitmap rotateBitmap(Bitmap source, float degrees, boolean recycle) {
         if (degrees == 0) return source;
         int w = source.getWidth();
@@ -421,7 +440,6 @@ public class BitmapUtils {
     /**
      * 渐变效果图，
      *
-     * @param context
      * @param resource
      * @param centerX
      *            渐变开始的地方（0~1）
@@ -473,4 +491,5 @@ public class BitmapUtils {
         // then the alpha bytes in the colors[] will be ignored (assumed to be FF)
         return Bitmap.createBitmap(cutPixels, 0, cutW, cutW, cutH, Config.ARGB_8888);
     }
+
 }

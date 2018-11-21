@@ -113,30 +113,21 @@ public class RawRgbUtils {
         if (size == 0) {
             return null;
         }
-        
-        int arg = 0;
-        if (size % 4 != 0) {
-            arg = 1;
+
+        int pixelCount = size / 4;
+        int[] color = new int[pixelCount];
+        byte alpha, red, green, blue;
+
+        for (int i = 0; i < pixelCount; ++i) {
+            blue = data[i * 4];
+            green = data[i * 4 + 1];
+            red = data[i * 4 + 2];
+            alpha = data[i * 4 + 3];
+
+            // ARGB_8888 格式
+            // int color = (A & 0xff) << 24 | (B & 0xff) << 16 | (G & 0xff) << 8 | (R & 0xff);
+            color[i] = (alpha & 0xff) << 24 | (blue & 0xff) << 16 | (green & 0xff) << 8 | (red & 0xff);
         }
-        Log.d(TAG, "convertABGR8888ToARGB8888Int...arg = " + arg);
-        
-        int[] color = new int[size / 4 + arg];
-        int alpha, red, green, blue;
-        
-        for (int i = 0; i < color.length; ++i) {
-            alpha = convertByteToInt(data[i * 4]);
-            blue = convertByteToInt(data[i * 4 + 1]);
-            green = convertByteToInt(data[i * 4 + 2]);
-            red = convertByteToInt(data[i * 4 + 3]);
-            
-            color[i] = (alpha << 24) | (red << 16) | (green << 8) | blue;
-            Log.d(TAG, "convertABGR8888ToARGB8888Int...color[" + i + "] = " + color[i]);
-        }
-        
-        if (arg == 1) {
-            color[color.length - 1] = 0xFF000000;
-        }
-        
         return color;
     }
 
@@ -147,4 +138,23 @@ public class RawRgbUtils {
         // 16 times said move left four bits, namely 4 power of 2
         return heightBit * 16 + lowBit;
     }
+
+    public static Bitmap convertRgbToBitmap(byte[] imageData, int width, int height) throws IllegalArgumentException {
+        int[] bmpData = new int[width * height];
+        for (int i = 0; i < height; i += 1) {
+            for (int j = 0; j < width; j += 1) {
+                byte r = imageData[i * width * 3 + j * 3];
+                byte g = imageData[i * width * 3 + j * 3 + 1];
+                byte b = imageData[i * width * 3 + j * 3 + 2];
+                int pixelVal = 0xFF000000;
+                pixelVal |= (r << 16) & 0x00FF0000;
+                pixelVal |= (g << 8) & 0x0000FF00;
+                pixelVal |= (b) & 0x000000FF;
+                bmpData[i * width + j] = pixelVal;
+            }
+        }
+        Bitmap bm = Bitmap.createBitmap(bmpData, width, height, Bitmap.Config.ARGB_8888);
+        return bm;
+    }
+
 }
