@@ -97,6 +97,8 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
         mFragmentList = new ArrayList<FragmentItem>();
         mFragmentList.add(new FragmentItem("StorageUtil", StorageUtilFragment.class.getName()));
         mFragmentList.add(new FragmentItem("DrawerLayout", DrawerLayoutFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("GridViewLayout", GridViewFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("ViewPager", ViewPagerFragment.class.getName()));
     }
 
     private void initView(View parent) {
