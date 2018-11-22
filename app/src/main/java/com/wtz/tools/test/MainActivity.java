@@ -7,10 +7,12 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.wtz.tools.R;
+import com.wtz.tools.Receiver.AppReceiver;
 
 public class MainActivity extends Activity {
     private final static String TAG = MainActivity.class.getName();
-    
+
+    private AppReceiver mAppReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +22,9 @@ public class MainActivity extends Activity {
         setContentView(R.layout.main);
         
         gotoIndexFragment();
+
+        mAppReceiver = new AppReceiver(this);
+        mAppReceiver.register();
     }
 
     @Override
@@ -49,6 +54,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy...");
+        mAppReceiver.unRegister();
         super.onDestroy();
     }
     
