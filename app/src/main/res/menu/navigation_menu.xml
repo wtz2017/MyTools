@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/group1"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/access_point"
+            android:icon="@drawable/access_point"
+            android:title="access_point"/>
+        <item
+            android:id="@+id/account"
+            android:icon="@drawable/account"
+            android:title="account"/>
+        <item
+            android:id="@+id/airplane"
+            android:icon="@drawable/airplane"
+            android:title="airplane"/>
+        <item
+            android:id="@+id/alarm"
+            android:icon="@drawable/alarm"
+            android:title="alarm"/>
+    </group>
+
+    <group
+        android:id="@+id/group2"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/amazon_drive"
+            android:icon="@drawable/amazon_drive"
+            android:title="amazon_drive"/>
+        <item
+            android:id="@+id/download"
+            android:icon="@drawable/download"
+            android:title="download"/>
+        <item
+            android:id="@+id/bike"
+            android:icon="@drawable/bike"
+            android:title="bike"/>
+        <item
+            android:id="@+id/comment"
+            android:icon="@drawable/comment"
+            android:title="comment"/>
+    </group>
+
+</menu>
