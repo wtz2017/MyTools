@@ -83,7 +83,7 @@ public class ViewPagerFragment extends Fragment {
         final List<View> pointViewList = new ArrayList<View>();
         mOpDescIndexLayout.removeAllViews();
         for (int i = 0; i < size; i++) {
-            View point = inflater.inflate(R.layout.img_index_point, mOpDescIndexLayout, false);
+            View point = inflater.inflate(R.layout.item_img_index_point, mOpDescIndexLayout, false);
             if (i == 0) {
                 point.setBackgroundResource(R.drawable.img_index_select);
                 point.setScaleX(1.267f);
