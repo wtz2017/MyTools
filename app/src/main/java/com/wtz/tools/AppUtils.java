@@ -21,7 +21,7 @@ import java.util.TreeMap;
 
 public class AppUtils {
 
-    public static String getVersionCode(Context context) {
+    public static String getSelfVersionCode(Context context) {
         String versionCode = "";
         try {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);

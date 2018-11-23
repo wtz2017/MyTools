@@ -59,15 +59,29 @@ public class ReflectUtil {
         return result;
     }
 
+    /**
+     * 从目标实例target中获取成员变量field的值
+     *
+     * @param field
+     * @param target
+     * @param <T>
+     * @return
+     */
+    public static <T> T getFieldValue(Field field, Object target) {
+        if (field == null) {
+            return null;
+        }
+
+        try {
+            return (T) field.get(target);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static Object invokeStaticMethod(Class<?> clazz, String methodName, Class[] argTypes,
             Object[] argValues, boolean hasReturnValue) {
-        try {
-            Constructor c1 = clazz.getDeclaredConstructor(String.class);
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
         return invokeMethod(clazz, null, methodName, argTypes, argValues, hasReturnValue);
     }
 
