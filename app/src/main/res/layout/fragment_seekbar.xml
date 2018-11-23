@@ -6,10 +6,20 @@
     android:gravity="center"
     android:orientation="vertical">
 
+    <ImageView
+        android:id="@+id/iv_run"
+        android:layout_width="@dimen/dp_60"
+        android:layout_height="@dimen/dp_60"
+        android:background="@drawable/selector_seek_img_button"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/run" />
+
     <LinearLayout
         android:layout_width="@dimen/dp_333"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/dp_3"
+        android:layout_marginTop="@dimen/dp_20"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -17,6 +27,7 @@
             android:id="@+id/iv_minus"
             android:layout_width="@dimen/dp_30"
             android:layout_height="@dimen/dp_30"
+            android:background="@drawable/selector_seek_img_button"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:scaleType="fitXY"
@@ -38,6 +49,7 @@
             android:layout_width="@dimen/dp_30"
             android:layout_height="@dimen/dp_30"
             android:layout_marginLeft="@dimen/dp_3"
+            android:background="@drawable/selector_seek_img_button"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:scaleType="fitXY"
