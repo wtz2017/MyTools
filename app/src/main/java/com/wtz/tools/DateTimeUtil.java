@@ -84,6 +84,29 @@ public class DateTimeUtil {
         return date.getTime();
     }
 
+    /**
+     * 把剩余毫秒数转化成“时:分:秒”字符串
+     * @param timeMilli
+     * @return
+     */
+    public static String changeRemainTimeToHms(long timeMilli) {
+        timeMilli = timeMilli / 1000;// 毫秒数转秒数
+        int second = (int) (timeMilli % 60);// 秒数除60得分钟数再取余得秒数
+        int minute = (int) (timeMilli / 60 % 60);// 秒数除两个60得小时再取余得分钟数
+        int hour = (int) (timeMilli / 60 / 60);// 秒数除两个60得小时数
+        String hourString = formatTime(String.valueOf(hour));
+        String minuteString = formatTime(String.valueOf(minute));
+        String secondString = formatTime(String.valueOf(second));
+        return hourString + ":" + minuteString + ":" + secondString;
+    }
+
+    private static String formatTime(String original) {
+        if (original != null && original.length() < 2) {
+            original = "0" + original;
+        }
+        return original;
+    }
+
     public static int getWeekOfYear(Calendar calendar) {
         int week = calendar.get(Calendar.WEEK_OF_YEAR);
         int day = calendar.get(Calendar.DAY_OF_WEEK);

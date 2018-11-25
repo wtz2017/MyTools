@@ -74,7 +74,7 @@ public class StringUtil {
         return paramsStr.substring(0, paramsStr.length() - 1);
     }
     
-    public static String getErroInfoFromException(Exception e) {
+    public static String getErroInfoFromException(Throwable e) {
         if (e == null) {
             return "";
         }

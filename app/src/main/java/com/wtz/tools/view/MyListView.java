@@ -1,4 +1,4 @@
-package com.wtz.tools;
+package com.wtz.tools.view;
 
 
 import android.content.Context;
