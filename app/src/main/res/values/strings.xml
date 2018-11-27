@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MyTools</string>
+    <string name="please_select_interpolator">请选择速度控制器</string>
 </resources>
