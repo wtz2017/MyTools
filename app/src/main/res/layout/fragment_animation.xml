@@ -1,44 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="3dp" >
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_60"
-        android:orientation="vertical"
-        android:layout_margin="5dp" >
+        android:layout_height="match_parent"
+        android:layout_margin="3dp"
+        android:orientation="vertical">
 
-    <View
-        android:id="@+id/v_target"
-        android:layout_width="@dimen/dp_60"
-        android:layout_height="@dimen/dp_60"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/animation_target_bg"/>
-
-    </LinearLayout>
-
-    <Spinner
-        android:id="@+id/spinner_interpolator"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:prompt="@string/please_select_interpolator" />
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:gravity="center"
-        android:orientation="vertical" >
-
-        <LinearLayout
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:text="一、补间动画演示" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_60"
+            android:layout_margin="5dp"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/v_target"
+                android:layout_width="@dimen/dp_60"
+                android:layout_height="@dimen/dp_60"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/animation_target_bg" />
+
+        </LinearLayout>
+
+        <Spinner
+            android:id="@+id/spinner_interpolator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:prompt="@string/please_select_interpolator" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/fadeInButton"
@@ -66,10 +68,10 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/scaleInButton"
@@ -97,10 +99,10 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/scaleRotateInButton"
@@ -117,10 +119,10 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/slideFadeInButton"
@@ -138,10 +140,10 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/rotateYButton"
@@ -169,6 +171,126 @@
                 android:layout_height="wrap_content"
                 android:text="swing_up_down" />
         </LinearLayout>
-    </LinearLayout>
 
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:text="二、属性动画演示" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_60"
+            android:layout_margin="5dp"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/v_target_property"
+                android:layout_width="@dimen/dp_60"
+                android:layout_height="@dimen/dp_60"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/animation_target_bg" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/oa_rotation_z_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OARotateZ" />
+
+            <Button
+                android:id="@+id/oa_rotation_x_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OARotateX" />
+
+            <Button
+                android:id="@+id/oa_rotation_y_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OARotateY" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/oa_scale_x_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OAScaleX" />
+
+            <Button
+                android:id="@+id/oa_scale_y_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OAScaleY" />
+
+            <Button
+                android:id="@+id/oa_alpha_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OAAlpha" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/oa_translation_x_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OATranslationX" />
+
+            <Button
+                android:id="@+id/oa_translation_y_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OATranslationY" />
+
+        </LinearLayout>
+
+        <com.wtz.tools.animation.SinAnimView
+            android:id="@+id/oa_sin_animView"
+            android:layout_width="@dimen/dp_300"
+            android:layout_height="@dimen/dp_200"
+            android:layout_gravity="center_horizontal" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/dp_6">
+
+            <Button
+                android:id="@+id/start_sin_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="startPointAnim" />
+
+            <Button
+                android:id="@+id/stop_sin_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="stopPointAnim" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

@@ -23,7 +23,9 @@ import android.widget.Button;
 import android.widget.Spinner;
 
 import com.wtz.tools.R;
-import com.wtz.tools.animation.TweenedAnimation;
+import com.wtz.tools.animation.SinAnimView;
+import com.wtz.tools.animation.PropertyAnimDemo;
+import com.wtz.tools.animation.TweenedAnimDemo;
 import com.wtz.tools.test.adapter.SpinnerAdapter;
 
 import java.util.ArrayList;
@@ -32,10 +34,24 @@ import java.util.List;
 public class AnimationFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = AnimationFragment.class.getSimpleName();
 
-    private View target;
+    private View tweenedTarget;
     private Spinner mSpinner;
     private Button fadeInButton, fadeOutButton, slideInButton, slideOutButton, scaleInButton, scaleOutButton, rotateInButton, rotateOutButton, scaleRotateInButton, scaleRotateOutButton,
             slideFadeInButton, slideFadeOutButton, rotateYButton, stopRotateYButton, swingUpDown;
+
+    private View propertyTarget;
+    private Button objAnimRotationXButton;
+    private Button objAnimRotationYButton;
+    private Button objAnimRotationZButton;
+    private Button objAnimAlphaButton;
+    private Button objAnimScaleXButton;
+    private Button objAnimScaleYButton;
+    private Button objTranslationXButton;
+    private Button objTranslationYButton;
+
+    private SinAnimView mSinAnimView;
+    private Button objStartSinButton;
+    private Button objStopSinButton;
 
     private List<InterpolatorItem> mInterpolatorItems = new ArrayList<>();
     private long durationMillis = 2000, delayMillis = 0;
@@ -58,14 +74,14 @@ public class AnimationFragment extends Fragment implements View.OnClickListener 
 
         View view = inflater.inflate(R.layout.fragment_animation, container, false);
 
-        target = view.findViewById(R.id.v_target);
+        tweenedTarget = view.findViewById(R.id.v_target);
 
         mSpinner = (Spinner) view.findViewById(R.id.spinner_interpolator);
         mSpinner.setAdapter(getAdapter());
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                TweenedAnimation.INTERPOLATOR = mInterpolatorItems.get(position).interpolator;
+                TweenedAnimDemo.INTERPOLATOR = mInterpolatorItems.get(position).interpolator;
             }
 
             @Override
@@ -79,34 +95,57 @@ public class AnimationFragment extends Fragment implements View.OnClickListener 
         fadeOutButton = (Button) view.findViewById(R.id.fadeOutButton);
         slideInButton = (Button) view.findViewById(R.id.slideInButton);
         slideOutButton = (Button) view.findViewById(R.id.slideOutButton);
-
         scaleInButton = (Button) view.findViewById(R.id.scaleInButton);
         scaleOutButton = (Button) view.findViewById(R.id.scaleOutButton);
         rotateInButton = (Button) view.findViewById(R.id.rotateInButton);
         rotateOutButton = (Button) view.findViewById(R.id.rotateOutButton);
-
         scaleRotateInButton = (Button) view.findViewById(R.id.scaleRotateInButton);
         scaleRotateOutButton = (Button) view.findViewById(R.id.scaleRotateOutButton);
         slideFadeInButton = (Button) view.findViewById(R.id.slideFadeInButton);
         slideFadeOutButton = (Button) view.findViewById(R.id.slideFadeOutButton);
+
+        // TODO: 2018/11/28  
         rotateYButton = (Button) view.findViewById(R.id.rotateYButton);
         stopRotateYButton = (Button) view.findViewById(R.id.stop_rotateY_button);
         swingUpDown = (Button) view.findViewById(R.id.btn_swing_up_down);
+
+        propertyTarget = view.findViewById(R.id.v_target_property);
+        objAnimRotationXButton = (Button) view.findViewById(R.id.oa_rotation_x_button);
+        objAnimRotationYButton = (Button) view.findViewById(R.id.oa_rotation_y_button);
+        objAnimRotationZButton = (Button) view.findViewById(R.id.oa_rotation_z_button);
+        objAnimAlphaButton = (Button) view.findViewById(R.id.oa_alpha_button);
+        objAnimScaleXButton = (Button) view.findViewById(R.id.oa_scale_x_button);
+        objAnimScaleYButton = (Button) view.findViewById(R.id.oa_scale_y_button);
+        objTranslationXButton = (Button) view.findViewById(R.id.oa_translation_x_button);
+        objTranslationYButton = (Button) view.findViewById(R.id.oa_translation_y_button);
+
+        mSinAnimView = view.findViewById(R.id.oa_sin_animView);
+        objStartSinButton = view.findViewById(R.id.start_sin_button);
+        objStopSinButton = view.findViewById(R.id.stop_sin_button);
 
         fadeInButton.setOnClickListener(this);
         fadeOutButton.setOnClickListener(this);
         slideInButton.setOnClickListener(this);
         slideOutButton.setOnClickListener(this);
-
         scaleInButton.setOnClickListener(this);
         scaleOutButton.setOnClickListener(this);
         rotateInButton.setOnClickListener(this);
         rotateOutButton.setOnClickListener(this);
-
         scaleRotateInButton.setOnClickListener(this);
         scaleRotateOutButton.setOnClickListener(this);
         slideFadeInButton.setOnClickListener(this);
         slideFadeOutButton.setOnClickListener(this);
+
+        objAnimRotationXButton.setOnClickListener(this);
+        objAnimRotationYButton.setOnClickListener(this);
+        objAnimRotationZButton.setOnClickListener(this);
+        objAnimAlphaButton.setOnClickListener(this);
+        objAnimScaleXButton.setOnClickListener(this);
+        objAnimScaleYButton.setOnClickListener(this);
+        objTranslationXButton.setOnClickListener(this);
+        objTranslationYButton.setOnClickListener(this);
+        objStartSinButton.setOnClickListener(this);
+        objStopSinButton.setOnClickListener(this);
 
         return view;
     }
@@ -170,31 +209,51 @@ public class AnimationFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onClick(View v) {
         if (v == fadeInButton) {
-            TweenedAnimation.fadeIn(target, durationMillis, delayMillis);
+            TweenedAnimDemo.fadeIn(tweenedTarget, durationMillis, delayMillis);
         } else if (v == fadeOutButton) {
-            TweenedAnimation.fadeOut(target, durationMillis, delayMillis);
+            TweenedAnimDemo.fadeOut(tweenedTarget, durationMillis, delayMillis);
         } else if (v == slideInButton) {
-            TweenedAnimation.slideIn(target, durationMillis, delayMillis);
+            TweenedAnimDemo.slideIn(tweenedTarget, durationMillis, delayMillis);
         } else if (v == slideOutButton) {
-            TweenedAnimation.slideOut(target, durationMillis, delayMillis);
+            TweenedAnimDemo.slideOut(tweenedTarget, durationMillis, delayMillis);
         } else if (v == scaleInButton) {
-            TweenedAnimation.scaleIn(target, durationMillis, delayMillis);
+            TweenedAnimDemo.scaleIn(tweenedTarget, durationMillis, delayMillis);
 
         } else if (v == scaleOutButton) {
-            TweenedAnimation.scaleOut(target, durationMillis, delayMillis);
+            TweenedAnimDemo.scaleOut(tweenedTarget, durationMillis, delayMillis);
         } else if (v == rotateInButton) {
-            TweenedAnimation.rotateIn(target, durationMillis, delayMillis);
+            TweenedAnimDemo.rotateIn(tweenedTarget, durationMillis, delayMillis);
         } else if (v == rotateOutButton) {
-            TweenedAnimation.rotateOut(target, durationMillis, delayMillis);
+            TweenedAnimDemo.rotateOut(tweenedTarget, durationMillis, delayMillis);
         } else if (v == scaleRotateInButton) {
-            TweenedAnimation.scaleRotateIn(target, durationMillis, delayMillis);
+            TweenedAnimDemo.scaleRotateIn(tweenedTarget, durationMillis, delayMillis);
 
         } else if (v == scaleRotateOutButton) {
-            TweenedAnimation.scaleRotateOut(target, durationMillis, delayMillis);
+            TweenedAnimDemo.scaleRotateOut(tweenedTarget, durationMillis, delayMillis);
         } else if (v == slideFadeInButton) {
-            TweenedAnimation.slideFadeIn(target, durationMillis, delayMillis);
+            TweenedAnimDemo.slideFadeIn(tweenedTarget, durationMillis, delayMillis);
         } else if (v == slideFadeOutButton) {
-            TweenedAnimation.slideFadeOut(target, durationMillis, delayMillis);
+            TweenedAnimDemo.slideFadeOut(tweenedTarget, durationMillis, delayMillis);
+        } else if (v == objAnimRotationZButton) {
+            PropertyAnimDemo.rotateZ(propertyTarget);
+        } else if (v == objAnimRotationXButton) {
+            PropertyAnimDemo.rotateX(propertyTarget);
+        } else if (v == objAnimRotationYButton) {
+            PropertyAnimDemo.rotateY(propertyTarget);
+        } else if (v == objAnimAlphaButton) {
+            PropertyAnimDemo.alpah(propertyTarget);
+        } else if (v == objAnimScaleXButton) {
+            PropertyAnimDemo.scaleX(propertyTarget);
+        } else if (v == objAnimScaleYButton) {
+            PropertyAnimDemo.scaleY(propertyTarget);
+        } else if (v == objTranslationXButton) {
+            PropertyAnimDemo.translationX(propertyTarget);
+        } else if (v == objTranslationYButton) {
+            PropertyAnimDemo.translationY(propertyTarget);
+        } else if (v == objStartSinButton) {
+            mSinAnimView.startAnimation();
+        } else if (v == objStopSinButton) {
+            mSinAnimView.stopAnimation();
         }
     }
 

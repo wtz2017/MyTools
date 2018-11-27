@@ -7,47 +7,14 @@ import android.view.animation.*;
 /**
  * 补间动画示例
  */
-public class TweenedAnimation {
+public class TweenedAnimDemo {
 
-    public static final String TAG = TweenedAnimation.class.getName();
+    public static final String TAG = TweenedAnimDemo.class.getName();
 
     private static final int RELA1 = Animation.RELATIVE_TO_SELF;
     private static final int RELA2 = Animation.RELATIVE_TO_PARENT;
 
     public static Interpolator INTERPOLATOR = new LinearInterpolator();
-
-//    public static void setEffect(Animation animation, int interpolatorType, long durationMillis, long delayMillis) {
-//        switch (interpolatorType) {
-//            case 0:
-//                animation.setInterpolator(new LinearInterpolator());
-//                break;
-//            case 1:
-//                animation.setInterpolator(new AccelerateInterpolator());
-//                break;
-//            case 2:
-//                animation.setInterpolator(new DecelerateInterpolator());
-//                break;
-//            case 3:
-//                animation.setInterpolator(new AccelerateDecelerateInterpolator());
-//                break;
-//            case 4:
-//                animation.setInterpolator(new BounceInterpolator());
-//                break;
-//            case 5:
-//                animation.setInterpolator(new OvershootInterpolator());
-//                break;
-//            case 6:
-//                animation.setInterpolator(new AnticipateInterpolator());
-//                break;
-//            case 7:
-//                animation.setInterpolator(new AnticipateOvershootInterpolator());
-//                break;
-//            default:
-//                break;
-//        }
-//        animation.setDuration(durationMillis);
-//        animation.setStartOffset(delayMillis);
-//    }
 
     public static void baseIn(View view, Animation animation, long durationMillis, long delayMillis) {
         animation.setInterpolator(INTERPOLATOR);
