@@ -24,6 +24,11 @@ public class PluginUtil {
     private static String sNativeLibraryDir;
     private static String[] sSupportedABINames;
 
+    /**
+     *
+     * @param classLoader 必须是与调用System.loadLibrary()的类的classLoader相同
+     * @param libPath
+     */
     public static void expandNativeLibraryDirectory(ClassLoader classLoader, File libPath) {
         List<File> libPathList = new ArrayList<File>();
         libPathList.add(libPath);
