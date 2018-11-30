@@ -3,6 +3,8 @@ package com.wtz.tools.test;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,9 +22,12 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 import com.wtz.tools.R;
+import com.wtz.tools.animation.FrameAnimDemo;
+import com.wtz.tools.animation.Roate3Lines;
 import com.wtz.tools.animation.SinAnimView;
 import com.wtz.tools.animation.PropertyAnimDemo;
 import com.wtz.tools.animation.TweenedAnimDemo;
@@ -34,10 +39,15 @@ import java.util.List;
 public class AnimationFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = AnimationFragment.class.getSimpleName();
 
+    private ImageView frameView;
+    private FrameAnimDemo frameAnimDemo;
+    private Handler handler = new Handler(Looper.getMainLooper());
+    private Button startFrameButton;
+
     private View tweenedTarget;
     private Spinner mSpinner;
     private Button fadeInButton, fadeOutButton, slideInButton, slideOutButton, scaleInButton, scaleOutButton, rotateInButton, rotateOutButton, scaleRotateInButton, scaleRotateOutButton,
-            slideFadeInButton, slideFadeOutButton, rotateYButton, stopRotateYButton, swingUpDown;
+            slideFadeInButton, slideFadeOutButton, upDownButton, rotateYButton, stopRotateYButton, swingUpDown;
 
     private View propertyTarget;
     private Button objAnimRotationXButton;
@@ -52,6 +62,13 @@ public class AnimationFragment extends Fragment implements View.OnClickListener 
     private SinAnimView mSinAnimView;
     private Button objStartSinButton;
     private Button objStopSinButton;
+
+    private View line1;
+    private View line2;
+    private View line3;
+    private Roate3Lines mRoate3Lines;
+    private Button startRoate3linesButton;
+    private Button stopRoate3linesButton;
 
     private List<InterpolatorItem> mInterpolatorItems = new ArrayList<>();
     private long durationMillis = 2000, delayMillis = 0;
@@ -73,6 +90,11 @@ public class AnimationFragment extends Fragment implements View.OnClickListener 
         Log.d(TAG, "onCreateView");
 
         View view = inflater.inflate(R.layout.fragment_animation, container, false);
+
+        frameView = view.findViewById(R.id.iv_frame_anim);
+        frameAnimDemo = new FrameAnimDemo();
+        frameAnimDemo.initFrameAnim(frameView, handler);
+        startFrameButton = view.findViewById(R.id.start_frame_anim_button);
 
         tweenedTarget = view.findViewById(R.id.v_target);
 
@@ -103,11 +125,7 @@ public class AnimationFragment extends Fragment implements View.OnClickListener 
         scaleRotateOutButton = (Button) view.findViewById(R.id.scaleRotateOutButton);
         slideFadeInButton = (Button) view.findViewById(R.id.slideFadeInButton);
         slideFadeOutButton = (Button) view.findViewById(R.id.slideFadeOutButton);
-
-        // TODO: 2018/11/28  
-        rotateYButton = (Button) view.findViewById(R.id.rotateYButton);
-        stopRotateYButton = (Button) view.findViewById(R.id.stop_rotateY_button);
-        swingUpDown = (Button) view.findViewById(R.id.btn_swing_up_down);
+        upDownButton = (Button) view.findViewById(R.id.upDownButton);
 
         propertyTarget = view.findViewById(R.id.v_target_property);
         objAnimRotationXButton = (Button) view.findViewById(R.id.oa_rotation_x_button);
@@ -123,6 +141,14 @@ public class AnimationFragment extends Fragment implements View.OnClickListener 
         objStartSinButton = view.findViewById(R.id.start_sin_button);
         objStopSinButton = view.findViewById(R.id.stop_sin_button);
 
+        line1 = view.findViewById(R.id.line1);
+        line2 = view.findViewById(R.id.line2);
+        line3 = view.findViewById(R.id.line3);
+        mRoate3Lines = new Roate3Lines(line1, line2, line3);
+        startRoate3linesButton = view.findViewById(R.id.start_roate3lines_button);
+        stopRoate3linesButton = view.findViewById(R.id.stop_roate3lines_button);
+
+        startFrameButton.setOnClickListener(this);
         fadeInButton.setOnClickListener(this);
         fadeOutButton.setOnClickListener(this);
         slideInButton.setOnClickListener(this);
@@ -135,6 +161,7 @@ public class AnimationFragment extends Fragment implements View.OnClickListener 
         scaleRotateOutButton.setOnClickListener(this);
         slideFadeInButton.setOnClickListener(this);
         slideFadeOutButton.setOnClickListener(this);
+        upDownButton.setOnClickListener(this);
 
         objAnimRotationXButton.setOnClickListener(this);
         objAnimRotationYButton.setOnClickListener(this);
@@ -146,6 +173,8 @@ public class AnimationFragment extends Fragment implements View.OnClickListener 
         objTranslationYButton.setOnClickListener(this);
         objStartSinButton.setOnClickListener(this);
         objStopSinButton.setOnClickListener(this);
+        startRoate3linesButton.setOnClickListener(this);
+        stopRoate3linesButton.setOnClickListener(this);
 
         return view;
     }
@@ -208,7 +237,9 @@ public class AnimationFragment extends Fragment implements View.OnClickListener 
 
     @Override
     public void onClick(View v) {
-        if (v == fadeInButton) {
+        if (v == startFrameButton) {
+            frameAnimDemo.startFrameAnim();
+        } if (v == fadeInButton) {
             TweenedAnimDemo.fadeIn(tweenedTarget, durationMillis, delayMillis);
         } else if (v == fadeOutButton) {
             TweenedAnimDemo.fadeOut(tweenedTarget, durationMillis, delayMillis);
@@ -218,7 +249,6 @@ public class AnimationFragment extends Fragment implements View.OnClickListener 
             TweenedAnimDemo.slideOut(tweenedTarget, durationMillis, delayMillis);
         } else if (v == scaleInButton) {
             TweenedAnimDemo.scaleIn(tweenedTarget, durationMillis, delayMillis);
-
         } else if (v == scaleOutButton) {
             TweenedAnimDemo.scaleOut(tweenedTarget, durationMillis, delayMillis);
         } else if (v == rotateInButton) {
@@ -227,13 +257,14 @@ public class AnimationFragment extends Fragment implements View.OnClickListener 
             TweenedAnimDemo.rotateOut(tweenedTarget, durationMillis, delayMillis);
         } else if (v == scaleRotateInButton) {
             TweenedAnimDemo.scaleRotateIn(tweenedTarget, durationMillis, delayMillis);
-
         } else if (v == scaleRotateOutButton) {
             TweenedAnimDemo.scaleRotateOut(tweenedTarget, durationMillis, delayMillis);
         } else if (v == slideFadeInButton) {
             TweenedAnimDemo.slideFadeIn(tweenedTarget, durationMillis, delayMillis);
         } else if (v == slideFadeOutButton) {
             TweenedAnimDemo.slideFadeOut(tweenedTarget, durationMillis, delayMillis);
+        } else if (v == upDownButton) {
+            TweenedAnimDemo.swingUpDown(tweenedTarget);
         } else if (v == objAnimRotationZButton) {
             PropertyAnimDemo.rotateZ(propertyTarget);
         } else if (v == objAnimRotationXButton) {
@@ -254,6 +285,10 @@ public class AnimationFragment extends Fragment implements View.OnClickListener 
             mSinAnimView.startAnimation();
         } else if (v == objStopSinButton) {
             mSinAnimView.stopAnimation();
+        } else if (v == startRoate3linesButton) {
+            mRoate3Lines.startRotate();
+        } else if (v == stopRoate3linesButton) {
+            mRoate3Lines.stopRotate();
         }
     }
 

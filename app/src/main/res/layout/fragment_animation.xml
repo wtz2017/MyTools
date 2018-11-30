@@ -12,7 +12,27 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="一、补间动画演示" />
+            android:text="一、帧动画演示" />
+
+        <Button
+            android:id="@+id/start_frame_anim_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="start" />
+
+        <ImageView
+            android:id="@+id/iv_frame_anim"
+            android:layout_width="@dimen/dp_163"
+            android:layout_height="@dimen/dp_233"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            android:visibility="invisible" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="二、补间动画演示" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -136,47 +156,19 @@
                 android:layout_height="wrap_content"
                 android:text="slideFadeOut" />
 
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
             <Button
-                android:id="@+id/rotateYButton"
+                android:id="@+id/upDownButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="rotateY" />
+                android:text="upDown" />
 
-            <Button
-                android:id="@+id/stop_rotateY_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="stopRotateY" />
-
-            <ImageView
-                android:id="@+id/img_loading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:contentDescription="@null"
-                android:visibility="gone" />
-
-            <Button
-                android:id="@+id/btn_swing_up_down"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="swing_up_down" />
         </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_20"
-            android:text="二、属性动画演示" />
+            android:text="三、属性动画演示" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -289,6 +281,61 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="stopPointAnim" />
+
+        </LinearLayout>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/roate3lines_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginBottom="@dimen/dp_5"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <View
+                android:id="@+id/line1"
+                android:layout_width="@dimen/dp_26"
+                android:layout_height="@dimen/dp_5"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/horizontal_line" />
+
+            <View
+                android:id="@+id/line2"
+                android:layout_width="@dimen/dp_26"
+                android:layout_height="@dimen/dp_5"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="9px"
+                android:background="@drawable/horizontal_line" />
+
+            <View
+                android:id="@+id/line3"
+                android:layout_width="@dimen/dp_26"
+                android:layout_height="@dimen/dp_5"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="9px"
+                android:background="@drawable/horizontal_line" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/dp_6">
+
+            <Button
+                android:id="@+id/start_roate3lines_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="startRoate3lines" />
+
+            <Button
+                android:id="@+id/stop_roate3lines_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="stopRoate3lines" />
 
         </LinearLayout>
 

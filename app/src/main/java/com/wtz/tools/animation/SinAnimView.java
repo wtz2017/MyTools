@@ -118,7 +118,6 @@ public class SinAnimView extends View {
             }
         });
 
-//
         ObjectAnimator animColor = ObjectAnimator.ofObject(this, "color", new ArgbEvaluator(), Color.GREEN,
                 Color.YELLOW, Color.BLUE, Color.WHITE, Color.RED);
         animColor.setRepeatCount(-1);
