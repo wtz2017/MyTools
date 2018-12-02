@@ -96,12 +96,17 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
     private void initFragmentListData() {
         mFragmentList = new ArrayList<FragmentItem>();
         mFragmentList.add(new FragmentItem("StorageUtil", StorageUtilFragment.class.getName()));
-        mFragmentList.add(new FragmentItem("DrawerLayout", DrawerLayoutFragment.class.getName()));
         mFragmentList.add(new FragmentItem("GridViewLayout", GridViewFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("下拉刷新", PullRefreshFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("DrawerLayout", DrawerLayoutFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("左拉抽屉", SwipeLayoutFragment.class.getName()));
         mFragmentList.add(new FragmentItem("ViewPager", ViewPagerFragment.class.getName()));
         mFragmentList.add(new FragmentItem("Seekbar", SeekbarAsyncTaskFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("LoadingTextView", LoadingTextViewFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("SwitchButton", SwitchButtonFragment.class.getName()));
         mFragmentList.add(new FragmentItem("打开帷幕", PullCurtainFragment.class.getName()));
         mFragmentList.add(new FragmentItem("动画演示", AnimationFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("折叠日历", CollapseCalendarFragment.class.getName()));
     }
 
     private void initView(View parent) {

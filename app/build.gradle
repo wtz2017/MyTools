@@ -22,8 +22,24 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.google.zxing:core:3.3.3'
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+
+    // SwipeLayout
+    implementation "com.daimajia.swipelayout:library:1.2.0@aar"
+
+    // Pull to Refresh
+    implementation 'com.yalantis:phoenix:1.2.3'
+
+    // shimmer
+    implementation 'com.romainpiel.shimmer:library:1.4.0@aar'
+
+    // SwitchButton
+    implementation 'com.github.zcweng:switch-button:0.0.3@aar'
+
+    // CollapseCalendar
+    implementation project(':CollapseCalendarView')
 }
