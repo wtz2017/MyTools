@@ -100,7 +100,8 @@ public class SurfaceViewFragment extends Fragment {
         private SurfaceHolder mSurfaceHolder;
         private Thread mDrawThread;
         private boolean canDraw;
-        private Paint mPaint;
+        private Paint mDefaultPaint;
+        private Paint mPenPaint;
         private Path mPath;
 
         public MySurfaceView(Context context) {
@@ -151,9 +152,15 @@ public class SurfaceViewFragment extends Fragment {
         @Override
         public void run() {
             // 创建画笔
-            mPaint = new Paint();
-            mPaint.setColor(Color.BLACK);
-            mPaint.setTextSize(30);
+            mDefaultPaint = new Paint();
+            mDefaultPaint.setColor(Color.BLACK);
+            mDefaultPaint.setTextSize(30);
+
+            mPenPaint = new Paint();
+            mPenPaint.setAntiAlias(true);
+            mPenPaint.setStyle(Paint.Style.STROKE);
+            mPenPaint.setStrokeWidth(20);
+            mPenPaint.setStrokeCap(Paint.Cap.ROUND);
 
             // 创建path
             mPath = new Path();
@@ -185,14 +192,14 @@ public class SurfaceViewFragment extends Fragment {
                 // 创建一个Rect对象rect
                 Rect rect = new Rect(100, 50, 380, 330);
                 // 在canvas上绘制rect
-                canvas.drawRect(rect, mPaint);
+                canvas.drawRect(rect, mDefaultPaint);
 
                 // 在canvas上绘制文本
-                canvas.drawText("Draw count = " + counter, 100, 410, mPaint);
-                canvas.drawText("You can touch draw path!", 100, 600, mPaint);
+                canvas.drawText("Draw count = " + counter, 100, 410, mDefaultPaint);
+                canvas.drawText("You can touch draw path!", 100, 600, mDefaultPaint);
 
                 // 在canvas上绘制path
-                canvas.drawPath(mPath, mPaint);
+                canvas.drawPath(mPath, mPenPaint);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
