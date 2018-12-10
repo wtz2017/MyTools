@@ -28,7 +28,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
     private int mCameraCount;
-    private int[] mCameraIds;
     private boolean canAutoFocus;
 
     private int mDisplayOrientation;
@@ -71,10 +70,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         mContext = context;
 
         mCameraCount = Camera.getNumberOfCameras();
-        mCameraIds = new int[mCameraCount];
-        for (int i = 0; i < mCameraCount; i++) {
-            mCameraIds[i] = i;
-        }
 
         canAutoFocus = context.getPackageManager().hasSystemFeature(
                 PackageManager.FEATURE_CAMERA_AUTOFOCUS);
