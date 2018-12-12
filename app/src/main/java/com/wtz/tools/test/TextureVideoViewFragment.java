@@ -15,14 +15,15 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.wtz.tools.R;
-import com.wtz.tools.view.VideoView;
+import com.wtz.tools.view.SurfaceVideoView;
+import com.wtz.tools.view.TextureVideoView;
 
-public class VideoViewFragment extends Fragment {
-    private static final String TAG = VideoViewFragment.class.getSimpleName();
+public class TextureVideoViewFragment extends Fragment {
+    private static final String TAG = TextureVideoViewFragment.class.getSimpleName();
 
     private static final String VIDEO_PATH = "/sdcard/test.mp4";
 
-    private VideoView videoView;
+    private TextureVideoView videoView;
     private SeekBar seekBar;
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
@@ -43,7 +44,7 @@ public class VideoViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
 
-        View view = inflater.inflate(R.layout.fragment_video_view, container, false);
+        View view = inflater.inflate(R.layout.fragment_texture_video_view, container, false);
 
         final ImageButton playPause = view.findViewById(R.id.ib_play_pause);
         final TextView currentTime = view.findViewById(R.id.tv_current_time);
@@ -151,6 +152,7 @@ public class VideoViewFragment extends Fragment {
     @Override
     public void onResume() {
         Log.d(TAG, "onResume");
+        videoView.setRotation(45.0f);
         super.onResume();
     }
 

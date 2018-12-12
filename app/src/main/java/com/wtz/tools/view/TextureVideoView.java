@@ -1,62 +1,65 @@
 package com.wtz.tools.view;
 
-import java.io.IOException;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
-import android.graphics.PixelFormat;
+import android.graphics.SurfaceTexture;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.Surface;
+import android.view.TextureView;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.MediaController.MediaPlayerControl;
 
+import java.io.IOException;
 
-public class VideoView extends SurfaceView implements MediaPlayerControl {
-    private String TAG = VideoView.class.getSimpleName();
+
+public class TextureVideoView extends TextureView implements TextureView.SurfaceTextureListener, MediaPlayerControl {
+    private static final String TAG = TextureVideoView.class.getSimpleName();
 
     private Context mContext;
+    private SurfaceTexture mSurfaceTexture = null;
+    private MediaPlayer mMediaPlayer = null;
 
     private Uri mUri;
     private int mDuration;
-
-    private SurfaceHolder mSurfaceHolder = null;
-    private MediaPlayer mMediaPlayer = null;
-    private boolean mIsPrepared;
     private int mVideoWidth;
     private int mVideoHeight;
     private int mSurfaceWidth;
     private int mSurfaceHeight;
-    private OnCompletionListener mOnCompletionListener;
-    private MediaPlayer.OnPreparedListener mOnPreparedListener;
-    private int mCurrentBufferPercentage;
-    private OnErrorListener mOnErrorListener;
-    private OnInfoListener mOnInfoListener;
+
+    private boolean mIsPrepared;
     private boolean mStartWhenPrepared;
     private int mSeekWhenPrepared;
+    private int mCurrentBufferPercentage;
 
-    public VideoView(Context context) {
+    private OnPreparedListener mOnPreparedListener;
+    private OnInfoListener mOnInfoListener;
+    private OnErrorListener mOnErrorListener;
+    private OnCompletionListener mOnCompletionListener;
+
+
+    public TextureVideoView(Context context) {
         super(context);
         mContext = context;
         initVideoView();
     }
 
-    public VideoView(Context context, AttributeSet attrs) {
+    public TextureVideoView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
         mContext = context;
         initVideoView();
     }
 
-    public VideoView(Context context, AttributeSet attrs, int defStyle) {
+    public TextureVideoView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         mContext = context;
         initVideoView();
@@ -84,41 +87,41 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
     private void initVideoView() {
         mVideoWidth = 0;
         mVideoHeight = 0;
-        getHolder().addCallback(mSurfaceCallback);
-        getHolder().setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
-        getHolder().setFormat(PixelFormat.RGBA_8888);
+        setSurfaceTextureListener(this);
         setFocusable(true);
         setFocusableInTouchMode(true);
     }
 
-    private SurfaceHolder.Callback mSurfaceCallback = new SurfaceHolder.Callback() {
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        Log.i(TAG, "onSurfaceTextureAvailable: " + width + "x" + height);
+        mSurfaceTexture = surface;
+        openVideo();
+    }
 
-        public void surfaceCreated(SurfaceHolder holder) {
-            mSurfaceHolder = holder;
-            openVideo();
-        }
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+        Log.i(TAG, "onSurfaceTextureSizeChanged: " + width + "x" + height);
+        mSurfaceWidth = width;
+        mSurfaceHeight = height;
+    }
 
-        public void surfaceChanged(SurfaceHolder holder, int format,
-                                   int w, int h) {
-            mSurfaceWidth = w;
-            mSurfaceHeight = h;
-            Log.i(TAG, "surfaceChanged---mSurfaceWidth:" + mSurfaceWidth
-                    + " mSurfaceHeight:" + mSurfaceHeight
-                    + " mIsPrepared:" + mIsPrepared
-                    + " mVideoWidth:" + mVideoWidth
-                    + " mVideoHeight:" + mVideoHeight);
-            if (mMediaPlayer != null && mIsPrepared && mVideoWidth == w && mVideoHeight == h) {
-                if (mSeekWhenPrepared != 0) {
-                    mMediaPlayer.seekTo(mSeekWhenPrepared);
-                    mSeekWhenPrepared = 0;
-                }
-            }
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        Log.i(TAG, "onSurfaceTextureDestroyed");
+        mSurfaceTexture = null;
+        if (mMediaPlayer != null) {
+            mMediaPlayer.reset();
+            mMediaPlayer.release();
+            mMediaPlayer = null;
         }
+        return true;
+    }
 
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            destroy();
-        }
-    };
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+        Log.i(TAG, "onSurfaceTextureUpdated");
+    }
 
     public void openVideo(String path) {
         Log.d(TAG, "setVideoPath: " + path);
@@ -156,69 +159,75 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
     }
 
     private void openVideo() {
-        if (mUri == null || mSurfaceHolder == null) {
+        if (mUri == null || mSurfaceTexture == null) {
             // not ready for playback just yet, will try again later
             return;
         }
 
-        if (mMediaPlayer != null) {
-            mMediaPlayer.reset();
-            mMediaPlayer.release();
-            mMediaPlayer = null;
-        }
-
         mIsPrepared = false;
-        mDuration = -1;
+        mDuration = 0;
         mCurrentBufferPercentage = 0;
 
         try {
-            mMediaPlayer = new MediaPlayer();
+            if (mMediaPlayer == null) {
+                mMediaPlayer = new MediaPlayer();
+                mMediaPlayer.setOnPreparedListener(mPreparedListener);
+                mMediaPlayer.setOnInfoListener(mInfoListener);
+                mMediaPlayer.setOnErrorListener(mErrorListener);
+                mMediaPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
+                mMediaPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
+                mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                mMediaPlayer.setSurface(new Surface(mSurfaceTexture));
+            } else {
+                mMediaPlayer.reset();
+            }
 
-            mMediaPlayer.setOnPreparedListener(mPreparedListener);
-            mMediaPlayer.setOnInfoListener(mInfoListener);
-            mMediaPlayer.setOnErrorListener(mErrorListener);
-            mMediaPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
-            mMediaPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
-            mMediaPlayer.setOnCompletionListener(mCompletionListener);
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mMediaPlayer.setScreenOnWhilePlaying(true);
             mMediaPlayer.setDataSource(mContext, mUri);
-            mMediaPlayer.setDisplay(mSurfaceHolder);
-
             mMediaPlayer.prepareAsync();
-
-            mSurfaceHolder.setFixedSize(getVideoWidth(), getVideoHeight());
         } catch (IOException ex) {
             Log.w(TAG, "Unable to open content: " + mUri, ex);
             return;
         } catch (IllegalArgumentException ex) {
             Log.w(TAG, "Unable to open content: " + mUri, ex);
             return;
+        } catch (Exception ex) {
+            Log.w(TAG, "Unable to open content: " + mUri, ex);
+            return;
+        }
+    }
+
+    private void setFixedSize(int width, int height) {
+        boolean change = false;
+        if (mVideoWidth != width) {
+            change = true;
+            mVideoWidth = width;
+        }
+        if (mVideoHeight != height) {
+            change = true;
+            mVideoHeight = height;
+        }
+        if (change) {
+            requestLayout();
         }
     }
 
     private MediaPlayer.OnVideoSizeChangedListener mSizeChangedListener =
             new MediaPlayer.OnVideoSizeChangedListener() {
                 public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-                    // mVideoWidth = mp.getVideoWidth();
-                    // mVideoHeight = mp.getVideoHeight();
-                    if (mVideoWidth != 0 && mVideoHeight != 0) {// TODO: 2018/12/12 ------
-                        //getHolder().setFixedSize(mVideoWidth, mVideoHeight);
-                    }
+                    Log.i(TAG, "onVideoSizeChanged: " + width + "x" + height
+                            + ", mVideoWidth=" + mVideoWidth + ", mVideoHeight=" + mVideoHeight);
+                    setFixedSize(mp.getVideoWidth(), mp.getVideoHeight());
                 }
             };
 
-    private MediaPlayer.OnPreparedListener mPreparedListener = new MediaPlayer.OnPreparedListener() {
+    private OnPreparedListener mPreparedListener = new OnPreparedListener() {
         public void onPrepared(MediaPlayer mp) {
             Log.i(TAG, "onPrepared");
             mIsPrepared = true;
 
-            mVideoWidth = mp.getVideoWidth();
-            mVideoHeight = mp.getVideoHeight();
+            setFixedSize(mp.getVideoWidth(), mp.getVideoHeight());
             Log.i(TAG, "mVideoWidth:" + mVideoWidth + " mVideoHeight:" + mVideoHeight + " mSurfaceWidth:" + mSurfaceWidth + " mSurfaceHeight:" + mSurfaceHeight);
-            if (mVideoWidth != 0 && mVideoHeight != 0) {
-                getHolder().setFixedSize(mVideoWidth, mVideoHeight);
-            }
 
             Log.i(TAG, "mStartWhenPrepared:" + mStartWhenPrepared + " mSeekWhenPrepared:" + mSeekWhenPrepared);
             if (mSeekWhenPrepared != 0) {
@@ -237,8 +246,8 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
         }
     };
 
-    private MediaPlayer.OnCompletionListener mCompletionListener =
-            new MediaPlayer.OnCompletionListener() {
+    private OnCompletionListener mCompletionListener =
+            new OnCompletionListener() {
                 public void onCompletion(MediaPlayer mp) {
                     if (mOnCompletionListener != null) {
                         mOnCompletionListener.onCompletion(mMediaPlayer);
@@ -246,8 +255,8 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
                 }
             };
 
-    private MediaPlayer.OnInfoListener mInfoListener =
-            new MediaPlayer.OnInfoListener() {
+    private OnInfoListener mInfoListener =
+            new OnInfoListener() {
                 public boolean onInfo(MediaPlayer mp, int what, int extra) {
                     if (mOnInfoListener != null) {
                         return mOnInfoListener.onInfo(mMediaPlayer, what, extra);
@@ -256,8 +265,8 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
                 }
             };
 
-    private MediaPlayer.OnErrorListener mErrorListener =
-            new MediaPlayer.OnErrorListener() {
+    private OnErrorListener mErrorListener =
+            new OnErrorListener() {
                 public boolean onError(MediaPlayer mp, int framework_err, int impl_err) {
                     Log.d(TAG, "Error: " + framework_err + "," + impl_err);
 
@@ -316,7 +325,7 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
      *
      * @param l The callback that will be run
      */
-    public void setOnPreparedListener(MediaPlayer.OnPreparedListener l) {
+    public void setOnPreparedListener(OnPreparedListener l) {
         mOnPreparedListener = l;
     }
 
@@ -387,7 +396,7 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
             mDuration = mMediaPlayer.getDuration();
             return mDuration;
         }
-        mDuration = -1;
+        mDuration = 0;
         return mDuration;
     }
 
@@ -444,15 +453,6 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
     @Override
     public int getAudioSessionId() {
         return 0;
-    }
-
-    public void destroy() {
-        Log.i(TAG, "destroy");
-        if (mMediaPlayer != null) {
-            mMediaPlayer.reset();
-            mMediaPlayer.release();
-            mMediaPlayer = null;
-        }
     }
 
 }
