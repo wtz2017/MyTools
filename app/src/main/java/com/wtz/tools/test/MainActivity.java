@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.wtz.tools.R;
 import com.wtz.tools.Receiver.AppReceiver;
+import com.wtz.tools.test.fragment.IndexFragment;
 
 public class MainActivity extends Activity {
     private final static String TAG = MainActivity.class.getName();

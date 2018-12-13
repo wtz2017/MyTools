@@ -10,7 +10,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
-import com.wtz.tools.network.NetworkDeviceUtils;
+import com.wtz.tools.utils.network.NetworkDeviceUtils;
 
 import java.util.List;
 

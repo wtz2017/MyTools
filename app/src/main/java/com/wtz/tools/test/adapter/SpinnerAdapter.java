@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.wtz.tools.test.AnimationFragment.InterpolatorItem;
+import com.wtz.tools.test.fragment.AnimationFragment.InterpolatorItem;
 
 import java.util.List;
 

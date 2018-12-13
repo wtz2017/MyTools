@@ -54,7 +54,7 @@ public class SurfaceVideoView extends SurfaceView implements MediaPlayerControl 
     }
 
     public SurfaceVideoView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+        super(context, attrs);
         mContext = context;
         initVideoView();
     }
