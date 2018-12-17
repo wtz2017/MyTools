@@ -7,4 +7,8 @@
     <color name="saffron">#F4B63E</color>
     <color name="eggplant">#663D4E</color>
     <color name="sienna">#EB6460</color>
+
+    <color name="image_bg_color">#CAE1FF</color>
+    <color name="image_press_color">#FFD700</color>
+    <color name="image_border_color">#9AFF9A</color>
 </resources>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/dp_3"
+        android:orientation="vertical">
+
+        <!-- ###### Android-Universal-Image-Loader ######-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Android-Universal-Image-Loader"
+            android:textColor="#ff000000"
+            android:textSize="@dimen/sp_21" />
+
+        <ImageView
+            android:id="@+id/iv_uil"
+            android:layout_width="@dimen/dp_315"
+            android:layout_height="@dimen/dp_176"
+            android:background="#CAE1FF"
+            android:scaleType="fitCenter" />
+
+        <!-- ###### Picasso ######-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_10"
+            android:text="Picasso"
+            android:textColor="#ff000000"
+            android:textSize="@dimen/sp_21" />
+
+        <ImageView
+            android:id="@+id/iv_picasso"
+            android:layout_width="@dimen/dp_315"
+            android:layout_height="@dimen/dp_176"
+            android:background="#CAE1FF"
+            android:scaleType="fitCenter" />
+
+        <!-- ###### Glide ######-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_10"
+            android:text="Glide"
+            android:textColor="#ff000000"
+            android:textSize="@dimen/sp_21" />
+
+        <ImageView
+            android:id="@+id/iv_glide"
+            android:layout_width="@dimen/dp_315"
+            android:layout_height="@dimen/dp_176"
+            android:background="#CAE1FF"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id="@+id/iv_glide_webp"
+            android:layout_width="@dimen/dp_315"
+            android:layout_height="@dimen/dp_176"
+            android:layout_marginTop="@dimen/dp_6"
+            android:background="#CAE1FF"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id="@+id/iv_glide_gif"
+            android:layout_width="@dimen/dp_315"
+            android:layout_height="@dimen/dp_176"
+            android:layout_marginTop="@dimen/dp_6"
+            android:background="#CAE1FF"
+            android:scaleType="fitCenter" />
+
+        <!-- ###### Fresco ######-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_10"
+            android:text="Fresco"
+            android:textColor="#ff000000"
+            android:textSize="@dimen/sp_21" />
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/iv_fresco"
+            android:layout_width="@dimen/dp_315"
+            android:layout_height="@dimen/dp_176"
+            android:background="#CAE1FF"
+            android:scaleType="fitCenter" />
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/iv_fresco_webp"
+            android:layout_width="@dimen/dp_315"
+            android:layout_height="@dimen/dp_176"
+            android:layout_marginTop="@dimen/dp_6"
+            android:background="#CAE1FF"
+            android:scaleType="fitCenter" />
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/iv_fresco_gif"
+            android:layout_width="@dimen/dp_315"
+            android:layout_height="@dimen/dp_176"
+            android:layout_marginTop="@dimen/dp_6"
+            android:background="#CAE1FF"
+            android:scaleType="fitCenter" />
+
+    </LinearLayout>
+
+</ScrollView>
