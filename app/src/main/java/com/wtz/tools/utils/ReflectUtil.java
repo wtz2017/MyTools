@@ -21,13 +21,13 @@ public class ReflectUtil {
         return (instance != null) ? instance.getClass() : null;
     }
 
-    public static Object[] getAllFields(Class clazz, Object instance) {
+    public static Object[] getAllFieldValues(Class clazz, Object instance) {
         Object[] objects = null;
         try {
             Field[] fields = clazz.getDeclaredFields();
             objects = new Object[fields.length];
             for (int i = 0; i < fields.length; i++) {
-                objects[i] = getField(clazz, instance, fields[i].getName());
+                objects[i] = getFieldValue(clazz, instance, fields[i].getName());
             }
         } catch (SecurityException e) {
             e.printStackTrace();
@@ -37,7 +37,7 @@ public class ReflectUtil {
         return objects;
     }
 
-    public static Object getField(Class clazz, Object instance, String fieldName) {
+    public static Object getFieldValue(Class clazz, Object instance, String fieldName) {
         Object result = null;
         try {
             // 非public要用declared获取
@@ -60,20 +60,33 @@ public class ReflectUtil {
     }
 
     /**
-     * 从目标实例target中获取成员变量field的值
+     * 从目标实例 instance 中获取成员变量 field 的值
      *
      * @param field
-     * @param target
+     * @param instance
      * @param <T>
      * @return
      */
-    public static <T> T getFieldValue(Field field, Object target) {
+    public static <T> T getFieldValue(Object instance, Field field) {
         if (field == null) {
             return null;
         }
 
         try {
-            return (T) field.get(target);
+            return (T) field.get(instance);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static <T> T getStaticFieldValue(Field field) {
+        if (field == null) {
+            return null;
+        }
+
+        try {
+            return (T) field.get(null);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return null;

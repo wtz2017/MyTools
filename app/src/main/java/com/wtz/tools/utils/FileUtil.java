@@ -22,8 +22,10 @@ import java.util.zip.ZipFile;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 public class FileUtil {
+    private final static String TAG = FileUtil.class.getSimpleName();
     
     private static DecimalFormat fileIntegerFormat = new DecimalFormat("#0");
     private static DecimalFormat fileDecimalFormat = new DecimalFormat("#0.0#");
@@ -265,6 +267,51 @@ public class FileUtil {
             } catch (Exception e) {
             }
         }
+    }
+
+    public static boolean saveFileFromSteam(InputStream inStream, long totalSize, String saveDir, String fileName) {
+        Log.d(TAG, "Save file from steam: " + inStream + "; save:" + saveDir + File.separator + fileName);
+        boolean result = false;
+        FileOutputStream fos = null;
+        try {
+            File dir = new File(saveDir);
+            if (!dir.exists() || !dir.isDirectory()) {
+                dir.mkdirs();
+            }
+
+            File target = new File(saveDir, fileName);
+            if (target.exists() && target.isFile()) {
+                target.delete();
+            }
+
+            long currentSize = 0;
+            byte buffer[] = new byte[1024 * 8];
+            int readSize = 0;
+            fos = new FileOutputStream(target);
+            while ((readSize = inStream.read(buffer)) > 0) {
+                fos.write(buffer, 0, readSize);
+                fos.flush();
+                currentSize += readSize;
+            }
+
+            if (totalSize < 0 || currentSize == totalSize) {
+                result = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+                if (inStream != null) {
+                    inStream.close();
+                }
+            } catch (Exception e) {
+            }
+        }
+
+        return result;
     }
 
     public static void mergeFile(File[] files, File target) {
