@@ -14,4 +14,9 @@ public class FragmentItem {
      * i.e. FileUtilFragment.class.getName()
      */
     public String fragmentClassName;
+
+    @Override
+    public String toString() {
+        return "FragmentItem:{name:" + name + ";fragmentClassName:" + fragmentClassName + "}";
+    }
 }

@@ -8,12 +8,23 @@ import android.util.Log;
 
 import com.wtz.tools.R;
 import com.wtz.tools.Receiver.AppReceiver;
+import com.wtz.tools.test.data.FragmentItem;
 import com.wtz.tools.test.fragment.IndexFragment;
+import com.wtz.tools.utils.event.RxBus;
+import com.wtz.tools.utils.event.RxBusFlowable;
+import com.wtz.tools.utils.event.RxBusRelay;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 public class MainActivity extends Activity {
     private final static String TAG = MainActivity.class.getName();
 
     private AppReceiver mAppReceiver;
+
+    private Disposable mDisposableEvent1;
+    private Disposable mDisposableEvent2;
+    private Disposable mDisposableEvent3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +37,26 @@ public class MainActivity extends Activity {
 
         mAppReceiver = new AppReceiver(this);
         mAppReceiver.register();
+
+        // Test RxBus
+        mDisposableEvent1 = RxBus.registerOnMainThread(FragmentItem.class, new Consumer<FragmentItem>() {
+            @Override
+            public void accept(FragmentItem fragmentItem) throws Exception {
+                Log.d(TAG, "RxBus accept FragmentItem: " + fragmentItem.toString());
+            }
+        });
+        mDisposableEvent2 = RxBusFlowable.registerOnMainThread(FragmentItem.class, new Consumer<FragmentItem>() {
+            @Override
+            public void accept(FragmentItem fragmentItem) throws Exception {
+                Log.d(TAG, "RxBusFlowable accept FragmentItem: " + fragmentItem.toString());
+            }
+        });
+        mDisposableEvent3 = RxBusRelay.registerOnMainThread(FragmentItem.class, new Consumer<FragmentItem>() {
+            @Override
+            public void accept(FragmentItem fragmentItem) throws Exception {
+                Log.d(TAG, "RxBusRelay accept FragmentItem: " + fragmentItem.toString());
+            }
+        });
     }
 
     @Override
@@ -56,6 +87,9 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         Log.d(TAG, "onDestroy...");
         mAppReceiver.unRegister();
+        RxBus.unregister(mDisposableEvent1);
+        RxBusFlowable.unregister(mDisposableEvent2);
+        RxBusRelay.unregister(mDisposableEvent3);
         super.onDestroy();
     }
     

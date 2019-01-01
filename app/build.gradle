@@ -27,34 +27,24 @@ dependencies {
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.google.zxing:core:3.3.3'
-
     // SwipeLayout
-    implementation "com.daimajia.swipelayout:library:1.2.0@aar"
-
+    implementation 'com.daimajia.swipelayout:library:1.2.0@aar'
     // Pull to Refresh
     implementation 'com.yalantis:phoenix:1.2.3'
-
     // shimmer
     implementation 'com.romainpiel.shimmer:library:1.4.0@aar'
-
     // SwitchButton
     implementation 'com.github.zcweng:switch-button:0.0.3@aar'
-
     // CollapseCalendar
     implementation project(':CollapseCalendarView')
-
     // ijk-player
     implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
     implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
     implementation 'tv.danmaku.ijk.media:ijkplayer-arm64:0.8.8'
-
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-
     implementation 'com.squareup.picasso:picasso:2.71828'
-
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
-
     // fresco 基本支持
     implementation 'com.facebook.fresco:fresco:1.11.0'
     // 支持 GIF 动图，需要添加
@@ -62,9 +52,12 @@ dependencies {
     // 支持 WebP （静态图+动图），需要添加
     implementation 'com.facebook.fresco:animated-webp:1.11.0'
     implementation 'com.facebook.fresco:webpsupport:1.11.0'
-
     // retrofit2
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
+    // rxjava2
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.5'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'com.jakewharton.rxrelay2:rxrelay:2.1.0'
 }

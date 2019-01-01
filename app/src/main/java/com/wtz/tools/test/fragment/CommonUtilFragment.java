@@ -10,10 +10,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.wtz.tools.R;
+import com.wtz.tools.test.data.FragmentItem;
 import com.wtz.tools.utils.StorageUtil;
+import com.wtz.tools.utils.event.RxBus;
+import com.wtz.tools.utils.event.RxBusFlowable;
+import com.wtz.tools.utils.event.RxBusRelay;
 
-public class StorageUtilFragment extends Fragment {
-    private static final String TAG = StorageUtilFragment.class.getSimpleName();
+public class CommonUtilFragment extends Fragment {
+    private static final String TAG = CommonUtilFragment.class.getSimpleName();
     
     private TextView tv1;
 
@@ -27,13 +31,16 @@ public class StorageUtilFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
+        RxBus.getInstance().send(new FragmentItem("haha", "haha-class"));
+        RxBusFlowable.getInstance().send(new FragmentItem("haha", "haha-class"));
+        RxBusRelay.getInstance().send(new FragmentItem("haha", "haha-class"));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
 
-        View view = inflater.inflate(R.layout.fragment_storage_util, container, false);
+        View view = inflater.inflate(R.layout.fragment_common_util, container, false);
         
         tv1 = (TextView) view.findViewById(R.id.tv1);
         StringBuilder stringBuilder = new StringBuilder();
