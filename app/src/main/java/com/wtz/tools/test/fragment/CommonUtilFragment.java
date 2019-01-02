@@ -15,11 +15,14 @@ import com.wtz.tools.utils.StorageUtil;
 import com.wtz.tools.utils.event.RxBus;
 import com.wtz.tools.utils.event.RxBusFlowable;
 import com.wtz.tools.utils.event.RxBusRelay;
+import com.wtz.tools.utils.network.OkhttpWebSocket;
 
 public class CommonUtilFragment extends Fragment {
     private static final String TAG = CommonUtilFragment.class.getSimpleName();
     
     private TextView tv1;
+    private String TEST_WEB_SOCKET_URL = "ws://echo.websocket.org";
+    private OkhttpWebSocket mWebSocket;
 
     @Override
     public void onAttach(Activity activity) {
@@ -34,6 +37,9 @@ public class CommonUtilFragment extends Fragment {
         RxBus.getInstance().send(new FragmentItem("haha", "haha-class"));
         RxBusFlowable.getInstance().send(new FragmentItem("haha", "haha-class"));
         RxBusRelay.getInstance().send(new FragmentItem("haha", "haha-class"));
+
+        mWebSocket = new OkhttpWebSocket(getActivity(), TEST_WEB_SOCKET_URL);
+        mWebSocket.connect();
     }
 
     @Override
@@ -106,6 +112,7 @@ public class CommonUtilFragment extends Fragment {
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
+        mWebSocket.destroy();
         super.onDestroy();
     }
 
