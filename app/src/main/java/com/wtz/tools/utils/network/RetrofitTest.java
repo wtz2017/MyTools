@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.SSLContext;
+
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -93,6 +95,14 @@ public class RetrofitTest {
                 .addInterceptor(new BaseInterceptor())
                 .addInterceptor(new HttpLoggingInterceptor())
                 .followRedirects(true);
+
+        if (false) {// 测试是否要忽略校验https的域名和证书
+            httpClientBuilder.hostnameVerifier(SSLUtil.getIgnoredHostnameVerifier());
+            SSLContext ignoredSSLContext = SSLUtil.getIgnoredSSLContext();
+            if (ignoredSSLContext != null) {
+                httpClientBuilder.sslSocketFactory(ignoredSSLContext.getSocketFactory());
+            }
+        }
 
         Gson gson = new GsonBuilder()
                 //配置你的Gson
