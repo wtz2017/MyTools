@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -36,7 +36,7 @@ import java.nio.ByteBuffer;
  * <p>This implementation acts as a last resort implementation, when
  * neither {@link Simple8BitZipEnoding} nor {@link NioZipEncoding} is
  * available.</p>
- * 
+ *
  * <p>The methods of this class are reentrant.</p>
  */
 class FallbackZipEncoding implements ZipEncoding {
@@ -52,7 +52,7 @@ class FallbackZipEncoding implements ZipEncoding {
 
     /**
      * Construct a fallback zip encoding, which uses the given charset.
-     * 
+     *
      * @param charset The name of the charset or {@code null} for
      *                the platform's default character set.
      */

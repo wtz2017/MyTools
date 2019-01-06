@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -43,7 +43,7 @@ class NioZipEncoding implements ZipEncoding {
     /**
      * Construct an NIO based zip encoding, which wraps the given
      * charset.
-     * 
+     *
      * @param charset The NIO charset to wrap.
      */
     public NioZipEncoding(Charset charset) {

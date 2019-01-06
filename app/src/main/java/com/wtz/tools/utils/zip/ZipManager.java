@@ -1,5 +1,10 @@
 package com.wtz.tools.utils.zip;
 
+import com.wtz.tools.utils.FileUtil;
+import com.wtz.tools.utils.zip.apache.ZipEntry;
+import com.wtz.tools.utils.zip.apache.ZipFile;
+import com.wtz.tools.utils.zip.apache.ZipOutputStream;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,206 +16,203 @@ import java.util.List;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 
-import org.apache.tools.zip.ZipEntry;
-import org.apache.tools.zip.ZipFile;
-import org.apache.tools.zip.ZipOutputStream;
-
+/**
+ * 可以解决中文名字压缩乱码和解压缩异常问题；
+ * 提供压缩和解压缩进度回调
+ */
 public class ZipManager {
-    public static final int BUFFER_SIZE = 1024 * 2;
+    private static final int BUFFER_SIZE = 1024 * 2;
 
-    public static List<String> getZipEntryName(File zipFile) throws Exception {
-        List<String> entryList = new ArrayList<String>();
-        ZipFile zf = null;
-
-        try {
-            zf = new ZipFile(zipFile);
-            Enumeration<?> entries = zf.getEntries();
-
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = ((ZipEntry) entries.nextElement());
-                String name = entry.getName();
-                entryList.add(name);
-            }
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            if (zf != null) {
-                try {
-                    zf.close();
-                } catch (Exception e) {
-                    throw e;
-                }
-            }
+    /**
+     * 解压文件到当前文件夹
+     *
+     * @param zipPath  待解压目标文件路径
+     * @param listener
+     * @throws Exception
+     */
+    public static void unzip(String zipPath, ZipListener listener) throws Exception {
+        if (!verifyFile(zipPath, listener)) {
+            return;
         }
 
-        return entryList;
+        String unzipPath = zipPath.substring(0, zipPath.lastIndexOf(File.separator));
+        unzip(zipPath, unzipPath, listener, true);
     }
 
-    public static void unzip(String sourceZip) throws Exception {
-        String destPath = getDefaultUnzipPath(sourceZip);
-        unzip(sourceZip, destPath, null);
+    /**
+     * 解压文件到指定文件夹
+     *
+     * @param zipPath   待解压目标文件路径
+     * @param unzipPath 解压保存文件夹
+     * @param listener
+     * @throws Exception
+     */
+    public static void unzip(String zipPath, String unzipPath, ZipListener listener) throws Exception {
+        unzip(zipPath, unzipPath, listener, false);
     }
 
-    public static void unzip(String sourceZip, String outputPath, ZipListener listener)
-            throws Exception {
+    private static void unzip(String zipPath, String unzipPath, ZipListener listener, boolean Verified) throws Exception {
+        if (!Verified && !verifyFile(zipPath, listener)) {
+            return;
+        }
+
+        if (listener != null) {
+            listener.onStart(unzipPath);
+        }
+
         ZipFile zip = null;
-        FileOutputStream fileOut = null;
-        File file;
-        InputStream inputStream = null;
-
         try {
-            long total = 0;
             ZipRecorder recorder = new ZipRecorder();
-            ZipFile zip1 = new ZipFile(sourceZip);
-            Enumeration<ZipEntry> entries1 = zip1.getEntries();
-            while (entries1.hasMoreElements()) {
-                ZipEntry zipEntry = entries1.nextElement();
-                total += zipEntry.getSize();
-            }
-            recorder.setTotalLength(total);
+            recorder.setTotalLength(getZipSize(zipPath));
 
-            if (listener != null) {
-                listener.onStart(outputPath);
-            }
-
-            File outputFolder = new File(outputPath);
+            File outputFolder = new File(unzipPath);
             if (!outputFolder.exists()) {
-                outputFolder.mkdir();
+                outputFolder.mkdirs();
             }
 
-            zip = new ZipFile(sourceZip);
+            zip = new ZipFile(zipPath);
             Enumeration<ZipEntry> entries = zip.getEntries();
             while (entries.hasMoreElements()) {
                 ZipEntry zipEntry = entries.nextElement();
-                file = new File(outputFolder, zipEntry.getName());
+                File file = new File(outputFolder, zipEntry.getName());
                 if (zipEntry.isDirectory()) {
+                    if (file.exists() && file.isFile()) {
+                        FileUtil.deleteFile(file);
+                    }
                     file.mkdirs();
                 } else {
+                    if (file.exists()) {
+                        FileUtil.deleteFile(file);
+                    }
                     File parent = file.getParentFile();
                     if (!parent.exists()) {
                         parent.mkdirs();
                     }
 
-                    inputStream = zip.getInputStream(zipEntry);
-                    fileOut = new FileOutputStream(file);
-                    int length = 0;
-                    byte[] buffer = new byte[BUFFER_SIZE];
-                    while ((length = inputStream.read(buffer)) != -1) {
-                        fileOut.write(buffer, 0, length);
-                        fileOut.flush();
+                    InputStream inputStream = null;
+                    FileOutputStream fileOut = null;
+                    try {
+                        inputStream = zip.getInputStream(zipEntry);
+                        fileOut = new FileOutputStream(file);
+                        int length = 0;
+                        byte[] buffer = new byte[BUFFER_SIZE];
+                        while ((length = inputStream.read(buffer)) != -1) {
+                            fileOut.write(buffer, 0, length);
+                            fileOut.flush();
 
-                        recorder.addCurrentLength(length);
-                        if (listener != null) {
-                            listener.onProgress(recorder.getCurrentLength(),
-                                    recorder.getTotalLength());
+                            recorder.addCurrentLength(length);
+                            if (listener != null) {
+                                listener.onProgress(recorder.getCurrentLength(), recorder.getTotalLength());
+                            }
+                        }
+                    } finally {
+                        if (inputStream != null) {
+                            try {
+                                inputStream.close();
+                            } catch (Exception e) {
+                            }
+                        }
+                        if (fileOut != null) {
+                            try {
+                                fileOut.close();
+                            } catch (Exception e) {
+                            }
                         }
                     }
-                    fileOut.close();
-                    inputStream.close();
                 }
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
             if (listener != null) {
-                listener.onError(e.getMessage());
+                listener.onError(e.toString());
+            } else {
+                throw e;
             }
         } finally {
-            if (null != fileOut) {
-                try {
-                    fileOut.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (null != inputStream) {
-                try {
-                    inputStream.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (null != zip) {
+            if (zip != null) {
                 try {
                     zip.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
-
             if (listener != null) {
-                listener.onEnd(outputPath);
+                listener.onEnd(unzipPath);
             }
         }
     }
 
-    private static String getDefaultUnzipPath(String sourceZip) throws Exception {
-        File srcFile = new File(sourceZip);
-        String absolutePath = srcFile.getAbsolutePath() + "";
-        String parentPath = "";
-        if (-1 != absolutePath.lastIndexOf(File.separator)) {
-            parentPath = absolutePath.substring(0, absolutePath.lastIndexOf(File.separator));
+    private static long getZipSize(String zipPath) throws IOException {
+        long total = 0;
+        ZipFile zip = new ZipFile(zipPath);
+        Enumeration<ZipEntry> entries = zip.getEntries();
+        while (entries.hasMoreElements()) {
+            ZipEntry zipEntry = entries.nextElement();
+            total += zipEntry.getSize();
         }
-        String separator = parentPath.endsWith(File.separator) ? "" : File.separator;
-        String unzipPath = parentPath + separator
-                + srcFile.getName().substring(0, srcFile.getName().lastIndexOf('.'))
-                + File.separator;
-        return unzipPath;
+        return total;
     }
 
-    public static void zip(File sourceFile) throws Exception {
-        zip(sourceFile.getAbsolutePath());
+    /**
+     * 压缩文件到当前目录
+     *
+     * @param sourcePath 待压缩文件路径
+     * @param listener
+     * @throws Exception
+     */
+    public static void zip(String sourcePath, ZipListener listener) throws Exception {
+        String destPath = sourcePath + ".zip";
+        zip(sourcePath, destPath, null, listener);
     }
 
-    public static void zip(String sourcePath) throws Exception {
-        String destPath = getDefaultZipPath(sourcePath);
-        zip(sourcePath, destPath, null, null);
-    }
-
-    private static String getDefaultZipPath(String sourcePath) throws Exception {
-        File srcFile = new File(sourcePath);
-        // String destPath = srcFile.getParent() + File.separator +
-        // srcFile.getName() + ".zip";
-
-        String absolutePath = srcFile.getAbsolutePath() + "";
-        String parentPath = "";
-        if (-1 != absolutePath.lastIndexOf(File.separator)) {
-            parentPath = absolutePath.substring(0, absolutePath.lastIndexOf(File.separator));
-        }
-        String separator = parentPath.endsWith(File.separator) ? "" : File.separator;
-        String zipPath = parentPath + separator + srcFile.getName() + ".zip";
-        return zipPath;
-    }
-
-    public static void zip(String sourcePath, String zipPathName, String comment, ZipListener listener)
-            throws Exception {
+    /**
+     * 压缩文件到指定目录
+     *
+     * @param sourcePath 待压缩文件路径
+     * @param zipPath    压缩文件保存路径
+     * @param comment    压缩注释说明
+     * @param listener
+     * @throws Exception
+     */
+    public static void zip(String sourcePath, String zipPath, String comment, ZipListener listener) throws Exception {
         List<String> list = new ArrayList<String>();
         list.add(sourcePath);
-        zip(list, zipPathName, comment, listener);
+        zip(list, zipPath, comment, listener);
     }
 
-    public static void zip(List<String> sourcePathList, String zipPathName, String comment,
-            ZipListener listener) throws Exception {
-        CheckedOutputStream cos = new CheckedOutputStream(new FileOutputStream(new File(zipPathName)),
-                new CRC32());
-        ZipOutputStream zos = new ZipOutputStream(cos);
+    /**
+     * 压缩文件列表到指定目录
+     *
+     * @param sourcePathList 待压缩文件路径列表
+     * @param zipPath    压缩文件保存路径
+     * @param comment        压缩注释说明
+     * @param listener
+     * @throws Exception
+     */
+    public static void zip(List<String> sourcePathList, String zipPath, String comment, ZipListener listener) throws Exception {
+        for (String sourcePath : sourcePathList) {
+            if (!verifyFile(sourcePath, listener)) {
+                return;
+            }
+        }
 
+        if (listener != null) {
+            listener.onStart(zipPath);
+        }
+
+        File saveZip = new File(zipPath);
+        if (saveZip.exists()) {
+            FileUtil.deleteFile(saveZip);
+        }
+
+        ZipOutputStream zos = new ZipOutputStream(new CheckedOutputStream(new FileOutputStream(saveZip), new CRC32()));
         // zos.setEncoding("gb2312");
         zos.setEncoding("utf8");
 
         ZipRecorder recorder = new ZipRecorder();
-
         long total = 0;
         for (String sourcePath : sourcePathList) {
-            total += calculateFileLength(new File(sourcePath));
+            total += FileUtil.getFileSize(new File(sourcePath));
         }
         recorder.setTotalLength(total);
-
-        if (listener != null) {
-            listener.onStart(zipPathName);
-        }
 
         try {
             for (String path : sourcePathList) {
@@ -221,9 +223,10 @@ public class ZipManager {
                 zos.setComment(comment);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             if (listener != null) {
-                listener.onError(e.getMessage());
+                listener.onError(e.toString());
+            } else {
+                throw e;
             }
         } finally {
             try {
@@ -231,18 +234,15 @@ public class ZipManager {
                     zos.closeEntry();
                     zos.close();
                 }
-            } catch (Exception e2) {
-                e2.printStackTrace();
+            } catch (Exception e) {
             }
-
             if (listener != null) {
-                listener.onEnd(zipPathName);
+                listener.onEnd(zipPath);
             }
         }
     }
 
-    private static void zip(String sourcePath, ZipOutputStream zipOut, ZipRecorder recorder,
-            ZipListener listener) throws Exception {
+    private static void zip(String sourcePath, ZipOutputStream zipOut, ZipRecorder recorder, ZipListener listener) throws Exception {
         File file = new File(sourcePath);
         if (file.isDirectory()) {
             zipFolder(sourcePath, zipOut, file.getName() + File.separator, recorder, listener);
@@ -252,7 +252,7 @@ public class ZipManager {
     }
 
     private static void zipFolder(String sourceFolder, ZipOutputStream zipOut, String entryPath,
-            ZipRecorder recorder, ZipListener listener) throws Exception {
+                                  ZipRecorder recorder, ZipListener listener) throws Exception {
         File file = new File(sourceFolder);
         File[] fileList = file.listFiles();
 
@@ -274,7 +274,7 @@ public class ZipManager {
     }
 
     private static void zipFile(String sourceFilePath, ZipOutputStream zipOut, String entryName,
-            ZipRecorder recorder, ZipListener listener) throws Exception {
+                                ZipRecorder recorder, ZipListener listener) throws Exception {
         ZipEntry entry = new ZipEntry(entryName);
         zipOut.putNextEntry(entry);
 
@@ -293,51 +293,61 @@ public class ZipManager {
                     listener.onProgress(current, total);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            if (listener != null) {
-                listener.onError(e.getMessage());
-            }
         } finally {
             if (fileIput != null) {
                 try {
                     fileIput.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
         }
 
     }
 
-    private static long calculateFileLength(File file) throws Exception {
-        if (file.isFile()) {
-            return file.length();
-        } else if (file.isDirectory()) {
-            return calculateDirectorySize(file);
+    private static boolean verifyFile(String filePath, ZipListener listener) {
+        if (filePath == null || !filePath.contains(File.separator)) {
+            if (listener != null) {
+                listener.onError("target path is invalid");
+            }
+            return false;
         }
 
-        return 0;
+        File target = new File(filePath);
+        if (!target.exists()) {
+            if (listener != null) {
+                listener.onError("target file does not exist");
+            }
+            return false;
+        }
+
+        return true;
     }
 
-    private static long calculateDirectorySize(File directory) {
-        long totalLength = 0;
-        File[] files = directory.listFiles();
+    public static List<String> getZipEntryNames(File zipFile) throws Exception {
+        List<String> entryList = new ArrayList<String>();
+        ZipFile zf = null;
 
-        if (files == null) {
-            return totalLength;
-        }
+        try {
+            zf = new ZipFile(zipFile);
+            Enumeration<?> entries = zf.getEntries();
 
-        for (File file : files) {
-            if (file.exists()) {
-                if (file.isFile()) {
-                    totalLength += file.length();
-                } else {
-                    totalLength += calculateDirectorySize(file);
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = ((ZipEntry) entries.nextElement());
+                String name = entry.getName();
+                entryList.add(name);
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            if (zf != null) {
+                try {
+                    zf.close();
+                } catch (Exception e) {
                 }
             }
         }
 
-        return totalLength;
+        return entryList;
     }
+
 }

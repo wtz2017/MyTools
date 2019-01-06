@@ -15,7 +15,7 @@
  *  limitations under the License.
  *
  */
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 /**
  * Parser/encoder for the "general purpose bit" field in ZIP's local

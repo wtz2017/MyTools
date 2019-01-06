@@ -15,7 +15,7 @@
  *  limitations under the License.
  *
  */
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 /**
  * Various constants used throughout the package.

@@ -16,7 +16,7 @@
  *
  */
 
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,14 +34,14 @@ import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.ZipException;
 
-import static org.apache.tools.zip.ZipConstants.DATA_DESCRIPTOR_MIN_VERSION;
-import static org.apache.tools.zip.ZipConstants.DWORD;
-import static org.apache.tools.zip.ZipConstants.INITIAL_VERSION;
-import static org.apache.tools.zip.ZipConstants.SHORT;
-import static org.apache.tools.zip.ZipConstants.WORD;
-import static org.apache.tools.zip.ZipConstants.ZIP64_MAGIC;
-import static org.apache.tools.zip.ZipConstants.ZIP64_MAGIC_SHORT;
-import static org.apache.tools.zip.ZipConstants.ZIP64_MIN_VERSION;
+import static com.wtz.tools.utils.zip.apache.ZipConstants.DATA_DESCRIPTOR_MIN_VERSION;
+import static com.wtz.tools.utils.zip.apache.ZipConstants.DWORD;
+import static com.wtz.tools.utils.zip.apache.ZipConstants.INITIAL_VERSION;
+import static com.wtz.tools.utils.zip.apache.ZipConstants.SHORT;
+import static com.wtz.tools.utils.zip.apache.ZipConstants.WORD;
+import static com.wtz.tools.utils.zip.apache.ZipConstants.ZIP64_MAGIC;
+import static com.wtz.tools.utils.zip.apache.ZipConstants.ZIP64_MAGIC_SHORT;
+import static com.wtz.tools.utils.zip.apache.ZipConstants.ZIP64_MIN_VERSION;
 
 /**
  * Reimplementation of {@link java.util.zip.ZipOutputStream
@@ -268,7 +268,7 @@ public class ZipOutputStream extends FilterOutputStream {
      * whether to use the general purpose bit flag when writing UTF-8
      * filenames or not.
      */
-    private boolean useUTF8Flag = true; 
+    private boolean useUTF8Flag = true;
 
     /**
      * Whether to encode non-encodable file names as UTF-8.
@@ -421,7 +421,7 @@ public class ZipOutputStream extends FilterOutputStream {
      * this mode is not valid when the output stream is not seekable
      * and the uncompressed size is unknown when {@link
      * #putNextEntry} is called.</p>
-     * 
+     *
      * <p>If no entry inside the resulting archive requires Zip64
      * extensions then {@link Zip64Mode#Never Never} will create the
      * smallest archive.  {@link Zip64Mode#AsNeeded AsNeeded} will
@@ -477,7 +477,7 @@ public class ZipOutputStream extends FilterOutputStream {
      * @since 1.1
      * @throws IOException on error
      * @throws Zip64RequiredException if the entry's uncompressed or
-     * compressed size exceeds 4 GByte and {@link #setUseZip64} 
+     * compressed size exceeds 4 GByte and {@link #setUseZip64}
      * is {@link Zip64Mode#Never}.
      */
     public void closeEntry() throws IOException {
@@ -625,9 +625,9 @@ public class ZipOutputStream extends FilterOutputStream {
     }
 
     /**
-     * {@inheritDoc} 
+     * {@inheritDoc}
      * @throws Zip64RequiredException if the entry's uncompressed or
-     * compressed size is known to exceed 4 GByte and {@link #setUseZip64} 
+     * compressed size is known to exceed 4 GByte and {@link #setUseZip64}
      * is {@link Zip64Mode#Never}.
      */
     public void putNextEntry(ZipEntry archiveEntry) throws IOException {
@@ -1089,7 +1089,7 @@ public class ZipOutputStream extends FilterOutputStream {
 
         // version made by
         // CheckStyle:MagicNumber OFF
-        writeOut(ZipShort.getBytes((ze.getPlatform() << 8) | 
+        writeOut(ZipShort.getBytes((ze.getPlatform() << 8) |
                                    (!hasUsedZip64 ? DATA_DESCRIPTOR_MIN_VERSION
                                                   : ZIP64_MIN_VERSION)));
         written += SHORT;

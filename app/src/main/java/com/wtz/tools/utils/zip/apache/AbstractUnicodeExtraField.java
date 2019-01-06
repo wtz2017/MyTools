@@ -16,7 +16,7 @@
  *
  */
 
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 import java.io.UnsupportedEncodingException;
 import java.util.zip.CRC32;

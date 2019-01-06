@@ -53,22 +53,19 @@ public class FileUtil {
         }
         return fileSizeString;
     }
-    
-    public static long calculateFileLength(File file) {
-        if (file == null || !file.exists()) {
-            return 0;
-        }
-        
-        if (file.isFile()) {
-            return file.length();
-        } else if (file.isDirectory()) {
-            return calculateDirectorySize(file);
-        }
 
+    public static long getFileSize(File file) throws Exception {
+        if (file != null && file.exists()) {
+            if (file.isFile()) {
+                return file.length();
+            } else {
+                return getDirectorySize(file);
+            }
+        }
         return 0;
     }
 
-    private static long calculateDirectorySize(File directory) {
+    private static long getDirectorySize(File directory) {
         long totalLength = 0;
         File[] files = directory.listFiles();
 
@@ -81,7 +78,7 @@ public class FileUtil {
                 if (file.isFile()) {
                     totalLength += file.length();
                 } else {
-                    totalLength += calculateDirectorySize(file);
+                    totalLength += getDirectorySize(file);
                 }
             }
         }

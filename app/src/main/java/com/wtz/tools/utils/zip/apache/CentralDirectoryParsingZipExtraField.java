@@ -16,34 +16,25 @@
  *
  */
 
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 import java.util.zip.ZipException;
 
 /**
- * Exception thrown when attempting to write data that requires Zip64
- * support to an archive and {@link ZipOutputStream#setUseZip64
- * UseZip64} has been set to {@link Zip64Mode#Never Never}.
- * @since Ant 1.9.0
+ * {@link ZipExtraField ZipExtraField} that knows how to parse central
+ * directory data.
+ *
+ * @since Ant 1.8.0
  */
-public class Zip64RequiredException extends ZipException {
-
-    private static final long serialVersionUID = 20110809L;
-
+public interface CentralDirectoryParsingZipExtraField extends ZipExtraField {
     /**
-     * Helper to format "entry too big" messages.
+     * Populate data from this array as if it was in central directory data.
+     * @param data an array of bytes
+     * @param offset the start offset
+     * @param length the number of bytes in the array from offset
+     *
+     * @throws ZipException on error
      */
-    static String getEntryTooBigMessage(ZipEntry ze) {
-        return ze.getName() + "'s size exceeds the limit of 4GByte.";
-    }
-
-    static final String ARCHIVE_TOO_BIG_MESSAGE =
-        "archive's size exceeds the limit of 4GByte.";
-
-    static final String TOO_MANY_ENTRIES_MESSAGE =
-        "archive contains more than 65535 entries.";
-
-    public Zip64RequiredException(String reason) {
-        super(reason);
-    }
+    void parseFromCentralDirectoryData(byte[] data, int offset, int length)
+        throws ZipException;
 }

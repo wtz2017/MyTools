@@ -16,7 +16,7 @@
  *
  */
 
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -42,9 +42,9 @@ public abstract class ZipEncodingHelper {
 
         /**
          * Instantiate a simple encoding holder.
-         * 
+         *
          * @param highChars The characters for byte codes 128 to 255.
-         * 
+         *
          * @see Simple8BitZipEncoding#Simple8BitZipEncoding(char[])
          */
         SimpleEncodingHolder(char [] highChars) {
@@ -137,8 +137,8 @@ public abstract class ZipEncodingHelper {
 
     /**
      * Grow a byte buffer, so it has a minimal capacity or at least
-     * the double capacity of the original buffer 
-     * 
+     * the double capacity of the original buffer
+     *
      * @param b The original buffer.
      * @param newCapacity The minimal requested new capacity.
      * @return A byte buffer <code>r</code> with
@@ -158,7 +158,7 @@ public abstract class ZipEncodingHelper {
         return on;
     }
 
- 
+
     /**
      * The hexadecimal digits <code>0,...,9,A,...,F</code> encoded as
      * ASCII bytes.
@@ -172,7 +172,7 @@ public abstract class ZipEncodingHelper {
     /**
      * Append <code>%Uxxxx</code> to the given byte buffer.
      * The caller must assure, that <code>bb.remaining()&gt;=6</code>.
-     * 
+     *
      * @param bb The byte buffer to write to.
      * @param c The character to write.
      */
@@ -205,13 +205,13 @@ public abstract class ZipEncodingHelper {
 
     /**
      * Instantiates a zip encoding.
-     * 
+     *
      * @param name The name of the zip encoding. Specify {@code null} for
      *             the platform's default encoding.
      * @return A zip encoding for the given encoding name.
      */
     public static ZipEncoding getZipEncoding(String name) {
- 
+
         // fallback encoding is good enough for utf-8.
         if (isUTF8(name)) {
             return UTF8_ZIP_ENCODING;

@@ -16,7 +16,7 @@
  *
  */
 
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 /**
  * Info-ZIP Unicode Comment Extra Field (0x6375):

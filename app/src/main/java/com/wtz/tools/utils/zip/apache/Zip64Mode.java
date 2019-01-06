@@ -16,7 +16,7 @@
  *
  */
 
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 /**
  * The different modes {@link ZipOutputStream} can operate in.

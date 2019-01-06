@@ -7,6 +7,7 @@ android {
         minSdkVersion 14
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 22
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -62,4 +63,6 @@ dependencies {
     implementation 'com.jakewharton.rxrelay2:rxrelay:2.1.0'
     // netty
     implementation 'io.netty:netty-all:4.1.10.Final'
+
+    implementation 'com.android.support:multidex:1.0.3'
 }

@@ -15,11 +15,12 @@
  *  limitations under the License.
  *
  */
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 import java.math.BigInteger;
 
-import static org.apache.tools.zip.ZipConstants.BYTE_MASK;
+import static com.wtz.tools.utils.zip.apache.ZipConstants.BYTE_MASK;
+
 
 /**
  * Utility class that represents an eight byte integer with conversion

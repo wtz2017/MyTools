@@ -16,7 +16,7 @@
  *
  */
 
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -155,7 +155,7 @@ public class ZipEntry extends java.util.zip.ZipEntry implements Cloneable {
      * entry name.</p>
      */
     public ZipEntry(File inputFile, String entryName) {
-        this(inputFile.isDirectory() && !entryName.endsWith("/") ? 
+        this(inputFile.isDirectory() && !entryName.endsWith("/") ?
              entryName + "/" : entryName);
         if (inputFile.isFile()){
             setSize(inputFile.length());

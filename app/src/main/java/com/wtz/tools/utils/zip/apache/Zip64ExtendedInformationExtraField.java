@@ -16,12 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 import java.util.zip.ZipException;
 
-import static org.apache.tools.zip.ZipConstants.DWORD;
-import static org.apache.tools.zip.ZipConstants.WORD;
+import static com.wtz.tools.utils.zip.apache.ZipConstants.DWORD;
+import static com.wtz.tools.utils.zip.apache.ZipConstants.WORD;
+
 
 /**
  * Holds size and other extended information for entries that use Zip64

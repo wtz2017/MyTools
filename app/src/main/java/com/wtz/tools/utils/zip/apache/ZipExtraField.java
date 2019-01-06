@@ -16,61 +16,44 @@
  *
  */
 
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 import java.util.zip.ZipException;
 
 /**
- * If this extra field is added as the very first extra field of the
- * archive, Solaris will consider it an executable jar file.
+ * General format of extra field data.
  *
- * @since Ant 1.6.3
+ * <p>Extra fields usually appear twice per file, once in the local
+ * file data and once in the central directory.  Usually they are the
+ * same, but they don't have to be.  {@link
+ * java.util.zip.ZipOutputStream java.util.zip.ZipOutputStream} will
+ * only use the local file data in both places.</p>
+ *
  */
-public final class JarMarker implements ZipExtraField {
-
-    private static final ZipShort ID = new ZipShort(0xCAFE);
-    private static final ZipShort NULL = new ZipShort(0);
-    private static final byte[] NO_BYTES = new byte[0];
-    private static final JarMarker DEFAULT = new JarMarker();
-
-    /** No-arg constructor */
-    public JarMarker() {
-        // empty
-    }
-
-    /**
-     * Since JarMarker is stateless we can always use the same instance.
-     * @return the DEFAULT jarmaker.
-     */
-    public static JarMarker getInstance() {
-        return DEFAULT;
-    }
+public interface ZipExtraField {
 
     /**
      * The Header-ID.
      * @return the header id
+     * @since 1.1
      */
-    public ZipShort getHeaderId() {
-        return ID;
-    }
+    ZipShort getHeaderId();
 
     /**
      * Length of the extra field in the local file data - without
      * Header-ID or length specifier.
-     * @return 0
+     * @return the length of the field in the local file data
+     * @since 1.1
      */
-    public ZipShort getLocalFileDataLength() {
-        return NULL;
-    }
+    ZipShort getLocalFileDataLength();
 
     /**
      * Length of the extra field in the central directory - without
      * Header-ID or length specifier.
-     * @return 0
+     * @return the length of the field in the central directory
+     * @since 1.1
      */
-    public ZipShort getCentralDirectoryLength() {
-        return NULL;
-    }
+    ZipShort getCentralDirectoryLength();
 
     /**
      * The actual data to put into local file data - without Header-ID
@@ -78,18 +61,15 @@ public final class JarMarker implements ZipExtraField {
      * @return the data
      * @since 1.1
      */
-    public byte[] getLocalFileDataData() {
-        return NO_BYTES;
-    }
+    byte[] getLocalFileDataData();
 
     /**
-     * The actual data to put central directory - without Header-ID or
+     * The actual data to put into central directory - without Header-ID or
      * length specifier.
      * @return the data
+     * @since 1.1
      */
-    public byte[] getCentralDirectoryData() {
-        return NO_BYTES;
-    }
+    byte[] getCentralDirectoryData();
 
     /**
      * Populate data from this array as if it was in local file data.
@@ -97,12 +77,9 @@ public final class JarMarker implements ZipExtraField {
      * @param offset the start offset
      * @param length the number of bytes in the array from offset
      *
+     * @since 1.1
      * @throws ZipException on error
      */
-    public void parseFromLocalFileData(byte[] data, int offset, int length)
-        throws ZipException {
-        if (length != 0) {
-            throw new ZipException("JarMarker doesn't expect any data");
-        }
-    }
+    void parseFromLocalFileData(byte[] data, int offset, int length)
+        throws ZipException;
 }

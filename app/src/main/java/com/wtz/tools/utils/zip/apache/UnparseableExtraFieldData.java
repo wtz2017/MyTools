@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.tools.zip;
+package com.wtz.tools.utils.zip.apache;
 
 /**
  * Wrapper for extra field data that doesn't conform to the recommended format of header-tag + size + data.
