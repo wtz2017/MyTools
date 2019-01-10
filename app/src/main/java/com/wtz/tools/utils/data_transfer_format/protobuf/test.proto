@@ -1,0 +1,28 @@
+//从“https://developers.google.com/protocol-buffers/docs/downloads”下载安装包
+//然后执行如下命令，生成JAVA代码：
+//protoc --java_out=./ Persion.proto
+//通过“--java_out”指定生成JAVA代码保存的目录，后面紧跟“.proto”文件的路径。
+
+//以下是消息内容：
+
+//option java_package = "com.test.protobuf";
+option java_outer_classname="PersonProtos";  
+  
+message Person {  
+  required string name = 1;  
+  required int32 id = 2;  
+  optional string email = 3;  
+  
+  enum PhoneType {  
+    MOBILE = 0;  
+    HOME = 1;  
+    WORK = 2;  
+  }  
+  
+  message PhoneNumber {  
+    required string number = 1;  
+    optional PhoneType type = 2 [default = HOME];  
+  }  
+  
+  repeated PhoneNumber phone = 4;  
+}  

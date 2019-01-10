@@ -1,4 +1,4 @@
-package com.wtz.tools.Receiver;
+package com.wtz.tools.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

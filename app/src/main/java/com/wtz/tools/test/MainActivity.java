@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.wtz.tools.R;
-import com.wtz.tools.Receiver.AppReceiver;
+import com.wtz.tools.receiver.AppReceiver;
 import com.wtz.tools.test.data.FragmentItem;
 import com.wtz.tools.test.fragment.IndexFragment;
 import com.wtz.tools.utils.event.RxBus;
