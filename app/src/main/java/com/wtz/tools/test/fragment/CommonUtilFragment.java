@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.wtz.tools.R;
 import com.wtz.tools.test.data.FragmentItem;
 import com.wtz.tools.utils.StorageUtil;
+import com.wtz.tools.utils.data_transfer_format.XmlDemo;
 import com.wtz.tools.utils.event.RxBus;
 import com.wtz.tools.utils.event.RxBusFlowable;
 import com.wtz.tools.utils.event.RxBusRelay;
@@ -38,8 +39,11 @@ public class CommonUtilFragment extends Fragment {
         RxBusFlowable.getInstance().send(new FragmentItem("haha", "haha-class"));
         RxBusRelay.getInstance().send(new FragmentItem("haha", "haha-class"));
 
+        // 需要在子线程里做
         mWebSocket = new OkhttpWebSocket(getActivity(), TEST_WEB_SOCKET_URL);
         mWebSocket.connect();
+
+        XmlDemo.test(getActivity());
     }
 
     @Override
