@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <!-- uses-sdk:minSdkVersion 14 cannot be smaller than version 21 declared in library [tv.danmaku.ijk.media:ijkplayer-arm64:0.8.8] -->
     <uses-sdk tools:overrideLibrary="tv.danmaku.ijk.media.player_arm64" />
