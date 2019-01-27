@@ -114,6 +114,7 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
         mFragmentList.add(new FragmentItem("动画演示", AnimationFragment.class.getName()));
         mFragmentList.add(new FragmentItem("折叠日历", CollapseCalendarFragment.class.getName()));
         mFragmentList.add(new FragmentItem("PopupWindow", PopupWindowFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("Dialog", DialogDemoFragment.class.getName()));
     }
 
     private void initView(View parent) {
