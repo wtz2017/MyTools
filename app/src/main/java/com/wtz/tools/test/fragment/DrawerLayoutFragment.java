@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.wtz.tools.R;
-import com.wtz.tools.utils.ToastUtils;
+import com.wtz.tools.view.ToastUtils;
 
 public class DrawerLayoutFragment extends Fragment {
 

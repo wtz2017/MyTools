@@ -14,7 +14,7 @@ import android.widget.PopupWindow;
 import android.widget.RadioGroup;
 
 import com.wtz.tools.R;
-import com.wtz.tools.utils.PopupWindowUtils;
+import com.wtz.tools.view.PopupWindowUtils;
 
 public class PopupWindowFragment extends Fragment implements RadioGroup.OnCheckedChangeListener {
     private static final String TAG = PopupWindowFragment.class.getSimpleName();

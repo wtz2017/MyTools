@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.wtz.tools.R;
-import com.wtz.tools.utils.DialogDemo;
+import com.wtz.tools.view.DialogDemo;
 
 public class DialogDemoFragment extends Fragment implements View.OnClickListener{
     private static final String TAG = DialogDemoFragment.class.getSimpleName();
