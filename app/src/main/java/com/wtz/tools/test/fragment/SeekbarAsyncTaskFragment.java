@@ -192,8 +192,6 @@ public class SeekbarAsyncTaskFragment extends Fragment implements View.OnTouchLi
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
-                current = mSeekBar.getProgress();
             }
             return current;
         }

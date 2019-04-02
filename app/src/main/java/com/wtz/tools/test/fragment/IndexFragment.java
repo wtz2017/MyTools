@@ -6,25 +6,29 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
 import com.wtz.tools.R;
 import com.wtz.tools.test.adapter.IndexListAdapter;
 import com.wtz.tools.test.data.FragmentItem;
+import com.wtz.tools.view.BottomLoadListView;
 
 public class IndexFragment extends Fragment implements OnItemClickListener{
     private final static String TAG = IndexFragment.class.getName();
     
     private ArrayList<FragmentItem> mFragmentList;
     
-    private ListView mListView;
+    private BottomLoadListView mListView;
     private IndexListAdapter mListAdapter;
+
+    private Handler mHandler = new Handler(Looper.getMainLooper());
     
     @Override
     public void onAttach(Activity activity) {
@@ -84,6 +88,7 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
+        mHandler.removeCallbacksAndMessages(null);
         super.onDestroy();
     }
 
@@ -108,6 +113,7 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
         mFragmentList.add(new FragmentItem("下拉刷新", PullRefreshFragment.class.getName()));
         mFragmentList.add(new FragmentItem("左拉抽屉", SwipeLayoutFragment.class.getName()));
         mFragmentList.add(new FragmentItem("Seekbar", SeekbarAsyncTaskFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("LoadingProgress", LoadingProgressFragment.class.getName()));
         mFragmentList.add(new FragmentItem("LoadingTextView", LoadingTextViewFragment.class.getName()));
         mFragmentList.add(new FragmentItem("SwitchButton", SwitchButtonFragment.class.getName()));
         mFragmentList.add(new FragmentItem("打开帷幕", PullCurtainFragment.class.getName()));
@@ -119,9 +125,23 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
 
     private void initView(View parent) {
         mListAdapter = new IndexListAdapter(getActivity(), mFragmentList);
-        mListView = (ListView) parent.findViewById(R.id.lv_index_list);
+        mListView = (BottomLoadListView) parent.findViewById(R.id.lv_index_list);
         mListView.setAdapter(mListAdapter);
         mListView.setOnItemClickListener(this);
+        mListView.setOnBottomLoadListener(new BottomLoadListView.OnBottomLoadListener() {
+            @Override
+            public void onLoad() {
+                Log.d(TAG, "onLoad...test");
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d(TAG, "load...complete");
+                        mListView.loadComplete();
+                    }
+                }, 5000);
+            }
+        });
+
         mListView.setSelection(0);
         mListView.requestFocus();
     }

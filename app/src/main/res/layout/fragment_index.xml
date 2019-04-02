@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <ListView
+    <com.wtz.tools.view.BottomLoadListView
         android:id="@+id/lv_index_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,7 +18,8 @@
         android:listSelector="@android:color/transparent"
         android:scrollbarThumbVertical="@drawable/scroll_bar_vertical"
         android:scrollingCache="false"
-        android:smoothScrollbar="true" >
-    </ListView>
+        android:smoothScrollbar="true"
+        app:footer="@layout/bottom_load_list_footer">
+    </com.wtz.tools.view.BottomLoadListView>
 
 </LinearLayout>
