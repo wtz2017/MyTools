@@ -4,6 +4,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +34,179 @@ public class StringUtil {
             list.add(matcher.group(0));
         }
         return list;
+    }
+
+    /**
+     * 查找第一个出现次数最多的字符
+     * @param str
+     * @return
+     * @throws NullPointerException
+     */
+    public static char findFirstMostChar(String str) throws NullPointerException {
+        if (str == null || str.equals("")) {
+            throw new NullPointerException("parameter str can't be null or empty");
+        }
+
+        char[] chars = str.toCharArray();
+        int size = chars.length;
+        Map<Character, Integer> map = new HashMap<>();
+
+        Character mostChar = null;
+        int mostCount = 0;
+        for (int i = 0; i < size; i++) {
+            Integer count = map.get(chars[i]);
+            if (count == null) {
+                count = 1;
+            } else {
+                ++count;
+            }
+            map.put(chars[i], count);
+            if (count > mostCount) {
+                mostCount = count;
+                if (mostChar == null || !mostChar.equals(chars[i])) {
+                    mostChar = chars[i];
+                }
+            }
+        }
+
+        return mostChar;
+    }
+
+    /**
+     * 查找第一个出现次数最多的汉字
+     * @param str
+     * @return
+     * @throws NullPointerException
+     */
+    public static char findFirstMostChineseChar(String str) throws NullPointerException {
+        if (str == null || str.equals("")) {
+            throw new NullPointerException("parameter str can't be null or empty");
+        }
+
+        Map<String, Integer> map = new HashMap<>();
+        String mostChar = null;
+        int mostCount = 0;
+
+        String reg = "[\\u4e00-\\u9fa5]";
+        Pattern p = Pattern.compile(reg);
+        Matcher m = p.matcher(str);
+        while (m.find()) {
+            String chinese = m.group();
+            Integer count = map.get(chinese);
+            if (count == null) {
+                count = 1;
+            } else {
+                ++count;
+            }
+            map.put(chinese, count);
+            if (count > mostCount) {
+                mostCount = count;
+                if (mostChar == null || !mostChar.equals(chinese)) {
+                    mostChar = chinese;
+                }
+            }
+        }
+
+        return mostChar.charAt(0);
+    }
+
+    /**
+     * 查找所有出现次数最多的字符
+     * @param str
+     * @return
+     * @throws NullPointerException
+     */
+    public static char[] findMostChars(String str) throws NullPointerException {
+        if (str == null || str.equals("")) {
+            throw new NullPointerException("parameter str can't be null or empty");
+        }
+
+        char[] chars = str.toCharArray();
+        int size = chars.length;
+        Map<Character, Integer> map = new LinkedHashMap<>();// 默认按插入顺序迭代
+
+        int mostCount = 0;
+        for (int i = 0; i < size; i++) {
+            Integer count = map.get(chars[i]);
+            if (count == null) {
+                count = 1;
+            } else {
+                ++count;
+            }
+            map.put(chars[i], count);
+            if (count > mostCount) {
+                mostCount = count;
+            }
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (Map.Entry<Character, Integer> entry : map.entrySet()) {
+            if (entry.getValue() == mostCount)
+                builder.append(entry.getKey());
+        }
+
+        return builder.toString().toCharArray();
+    }
+
+    /**
+     * 查找所有出现次数最多的汉字
+     * @param str
+     * @return
+     * @throws NullPointerException
+     */
+    public static char[] findMostChineseChars(String str) throws NullPointerException {
+        if (str == null || str.equals("")) {
+            throw new NullPointerException("parameter str can't be null or empty");
+        }
+
+        String reg = "[\\u4e00-\\u9fa5]";
+        Pattern p = Pattern.compile(reg);
+        Matcher m = p.matcher(str);
+        int mostCount = 0;
+        Map<String, Integer> map = new LinkedHashMap<>();// 默认按插入顺序迭代
+        while (m.find()) {
+            String chinese = m.group();
+            Integer count = map.get(chinese);
+            if (count == null) {
+                count = 1;
+            } else {
+                ++count;
+            }
+            map.put(chinese, count);
+            if (count > mostCount) {
+                mostCount = count;
+            }
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+            if (entry.getValue() == mostCount)
+                builder.append(entry.getKey());
+        }
+
+        return builder.toString().toCharArray();
+    }
+
+    /**
+     * 提取汉字
+     * @param str
+     * @return
+     * @throws NullPointerException
+     */
+    public static String extractChineseCharacters(String str) throws NullPointerException {
+        if (str == null || str.equals("")) {
+            throw new NullPointerException("parameter str can't be null or empty");
+        }
+
+        String reg = "[\\u4e00-\\u9fa5]";
+        Pattern p = Pattern.compile(reg);
+        Matcher m = p.matcher(str);
+        StringBuilder builder = new StringBuilder();
+        while (m.find()) {
+            builder.append(m.group());
+        }
+
+        return builder.toString();
     }
     
     /**
