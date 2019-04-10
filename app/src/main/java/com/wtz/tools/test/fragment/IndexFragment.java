@@ -108,6 +108,7 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
         mFragmentList.add(new FragmentItem("IjkPlayer", IjkPlayerFragment.class.getName()));
         mFragmentList.add(new FragmentItem("图片框架", ImageFrameworkFragment.class.getName()));
         mFragmentList.add(new FragmentItem("GridViewLayout", GridViewFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("RecyclerViewItemDecoration", RecyclerViewItemDecorationFragment.class.getName()));
         mFragmentList.add(new FragmentItem("ViewPager", ViewPagerFragment.class.getName()));
         mFragmentList.add(new FragmentItem("DrawerLayout", DrawerLayoutFragment.class.getName()));
         mFragmentList.add(new FragmentItem("下拉刷新", PullRefreshFragment.class.getName()));

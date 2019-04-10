@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btn_divider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="分割线示例"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/btn_divider1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="颜色分割线示例"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/btn_divider2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="时间轴示例"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/btn_divider3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="排行榜示例"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/btn_divider4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="普通头部示例"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/btn_divider5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="悬停头部示例"
+        android:textSize="24sp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/divider_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>
