@@ -2,7 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:ProgressWheel="http://schemas.android.com/apk/res-auto">
+    xmlns:ProgressWheel="http://schemas.android.com/apk/res-auto"
+    xmlns:ProgressRound="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -67,6 +68,16 @@
             ProgressWheel:pwBarColor="#0097D6"
             ProgressWheel:pwBarWidth="5dp"
             ProgressWheel:pwRimWidth="2dp" />
+
+        <com.wtz.tools.view.ProgressRound
+            android:id="@+id/progress_round"
+            android:layout_width="@dimen/dp_150"
+            android:layout_height="@dimen/dp_150"
+            ProgressRound:roundColor="#0097D6"
+            ProgressRound:roundProgressColor="#FF0000"
+            ProgressRound:textColor="#00FF00"
+            ProgressRound:textSize="@dimen/sp_40"
+            />
 
     </LinearLayout>
 </ScrollView>

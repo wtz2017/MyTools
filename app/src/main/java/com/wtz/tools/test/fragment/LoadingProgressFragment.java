@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.wtz.tools.R;
+import com.wtz.tools.view.ProgressRound;
 import com.wtz.tools.view.ProgressWheel;
 
 public class LoadingProgressFragment extends Fragment {
@@ -21,6 +22,7 @@ public class LoadingProgressFragment extends Fragment {
     private int mCount;
 
     private ProgressWheel mProgressWheel;
+    private ProgressRound mProgressRound;
 
     @Override
     public void onAttach(Activity activity) {
@@ -56,6 +58,9 @@ public class LoadingProgressFragment extends Fragment {
         mProgressWheel = view.findViewById(R.id.progress_wheel);
         mProgressWheel.startSpinning();
 
+        mProgressRound = view.findViewById(R.id.progress_round);
+        mProgressRound.runAnimate(0.7f);
+
         return view;
     }
 
@@ -87,6 +92,7 @@ public class LoadingProgressFragment extends Fragment {
     public void onDestroyView() {
         Log.d(TAG, "onDestroyView");
         mProgressWheel.stopSpinning();
+        mProgressRound.cancelAnimate();
         super.onDestroyView();
     }
 
