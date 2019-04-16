@@ -221,17 +221,18 @@ public class FileUtil {
     }
 
     public static String readFile(String filePath) {
-        String content = "";
+        StringBuilder builder = new StringBuilder();
         BufferedReader reader = null;
         String lineEnd = System.getProperty("line.separator");
         try {
             FileInputStream fin = new FileInputStream(filePath);
             BufferedInputStream bis = new BufferedInputStream(fin);
             reader = new BufferedReader(new InputStreamReader(bis));
+
             String tempRead = reader.readLine();
             while (tempRead != null) {
-                content += tempRead;
-                content += lineEnd;
+                builder.append(tempRead);
+                builder.append(lineEnd);
                 tempRead = reader.readLine();
             }
         } catch (Exception e) {
@@ -246,7 +247,7 @@ public class FileUtil {
             }
         }
 
-        return content;
+        return builder.toString();
     }
 
     public static void writeStringToFile(String content, String fileName, boolean append) {

@@ -43,7 +43,7 @@ public class ViewPagerFragment extends Fragment {
         mImageList.add("http://imgsrc.baidu.com/image/c0%3Dshijue1%2C0%2C0%2C294%2C40/sign=9b867a04b299a9012f38537575fc600e/4d086e061d950a7b86bee8d400d162d9f2d3c913.jpg");
         mImageList.add("http://imgsrc.baidu.com/image/c0%3Dshijue1%2C0%2C0%2C294%2C40/sign=16f6ff0030292df583cea456d4583615/e1fe9925bc315c60b6b051c087b1cb13495477f3.jpg");
         mImageList.add("http://img.pptjia.com/image/20180117/f4b76385a3ccdbac48893cc6418806d5.jpg");
-        mImageList.add("http://pic.qiantucdn.com/58pic/25/99/58/58aa038a167e4_1024.jpg");
+        mImageList.add("https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size=b4000_4000&sec=1555409977&di=1cfd95dd9a6f6459de52ecf42ef50e0c&src=http://pic1.win4000.com/wallpaper/a/59a4d26aa053f.jpg");
         mImageList.add("http://imgsrc.baidu.com/imgad/pic/item/0bd162d9f2d3572c25e340088013632763d0c3e5.jpg");
     }
 
