@@ -85,7 +85,7 @@ public class GZipUtil {
                 gos.write(data, 0, count);
             }
             gos.finish();
-            gos.flush();
+//            gos.flush();//finish与flush只能用一个
         } finally {
             if (gos != null) {
                 gos.close();

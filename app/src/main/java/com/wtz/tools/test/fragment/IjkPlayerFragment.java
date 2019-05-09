@@ -21,7 +21,12 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 public class IjkPlayerFragment extends Fragment {
     private static final String TAG = IjkPlayerFragment.class.getSimpleName();
 
-    private static final String VIDEO_PATH = "/sdcard/test.mp4";
+//    private static final String VIDEO_PATH = "/sdcard/test.mp4";
+//    private static final String VIDEO_PATH = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
+//    private static final String VIDEO_PATH = "https://www.apple.com/105/media/cn/mac/family/2018/46c4b917_abfd_45a3_9b51_4e3054191797/films/bruce/mac-bruce-tpl-cn-2018_1280x720h.mp4";
+//    private static final String VIDEO_PATH = "http://flv3.bn.netease.com/tvmrepo/2018/6/H/9/EDJTRBEH9/SD/EDJTRBEH9-mobile.mp4";
+//    private static final String VIDEO_PATH = "rtmp://live.hkstv.hk.lxdns.com/live/hks1";
+    private static final String VIDEO_PATH = "http://ksy.fffffive.com/mda-hinp1ik37b0rt1mj/mda-hinp1ik37b0rt1mj.mp4";
 
     private SurfaceIjkVideoView videoView;
     private SeekBar seekBar;

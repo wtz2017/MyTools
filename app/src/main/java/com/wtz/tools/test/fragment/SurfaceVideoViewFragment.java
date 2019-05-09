@@ -20,7 +20,9 @@ import com.wtz.tools.view.SurfaceVideoView;
 public class SurfaceVideoViewFragment extends Fragment {
     private static final String TAG = SurfaceVideoViewFragment.class.getSimpleName();
 
-    private static final String VIDEO_PATH = "/sdcard/test.mp4";
+//    private static final String VIDEO_PATH = "/sdcard/test.mp4";
+    private static final String VIDEO_PATH = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
+
 
     private SurfaceVideoView videoView;
     private SeekBar seekBar;

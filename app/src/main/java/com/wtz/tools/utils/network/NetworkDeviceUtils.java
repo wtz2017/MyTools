@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
@@ -342,21 +343,14 @@ public class NetworkDeviceUtils {
                 case ConnectivityManager.TYPE_ETHERNET:
                     net_type = "ethernet";
                     try {
-                        for (Enumeration<NetworkInterface> en = NetworkInterface
-                                .getNetworkInterfaces(); en.hasMoreElements(); ) {
-                            {
-                                NetworkInterface netInterface = en.nextElement();
-                                List<InterfaceAddress> mList = netInterface.getInterfaceAddresses();
-                                for (InterfaceAddress interfaceAddress : mList) {
-                                    InetAddress inetAddress = interfaceAddress.getAddress();
-                                    if (!inetAddress.isLoopbackAddress()) {
-                                        String hostAddress = inetAddress.getHostAddress();
-                                        if (!hostAddress.contains("::")) {
-                                            ip = hostAddress;
-                                            mask = calcMaskByPrefixLength(interfaceAddress
-                                                    .getNetworkPrefixLength());
-                                        }
-                                    }
+                        for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+                            NetworkInterface netInterface = en.nextElement();
+                            List<InterfaceAddress> mList = netInterface.getInterfaceAddresses();
+                            for (InterfaceAddress interfaceAddress : mList) {
+                                InetAddress inetAddress = interfaceAddress.getAddress();
+                                if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                                    ip = inetAddress.getHostAddress();
+                                    mask = calcMaskByPrefixLength(interfaceAddress.getNetworkPrefixLength());
                                 }
                             }
                         }
@@ -419,6 +413,21 @@ public class NetworkDeviceUtils {
                     break;
                 case ConnectivityManager.TYPE_MOBILE:
                     net_type = "mobile";
+                    try {
+                        for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+                            NetworkInterface netInterface = en.nextElement();
+                            List<InterfaceAddress> mList = netInterface.getInterfaceAddresses();
+                            for (InterfaceAddress interfaceAddress : mList) {
+                                InetAddress inetAddress = interfaceAddress.getAddress();
+                                if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                                    ip = inetAddress.getHostAddress();
+                                    mask = calcMaskByPrefixLength(interfaceAddress.getNetworkPrefixLength());
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     break;
                 default:
                     net_type = "unknown";
@@ -435,6 +444,22 @@ public class NetworkDeviceUtils {
         results.put("ssid", ssid);
         results.put("bssid", bssid);
         return results;
+    }
+
+    public static String getLocalIpAddress() {
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                        return inetAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException ex) {
+        }
+        return "";
     }
 
     private static String calcMaskByPrefixLength(int length) {
@@ -537,36 +562,6 @@ public class NetworkDeviceUtils {
             e.printStackTrace();
         }
         return value;
-    }
-    //================================
-
-    public static String getLocalIPAddress() {
-        String ipAddress = null;
-        try {
-            for (Enumeration mEnumeration = NetworkInterface.getNetworkInterfaces(); mEnumeration
-                    .hasMoreElements(); ) {
-                NetworkInterface netInterface = (NetworkInterface) mEnumeration.nextElement();
-                if (netInterface.getName().toLowerCase().equals("eth0")
-                        || netInterface.getName().toLowerCase().equals("wlan0")) {
-                    for (Enumeration enumIPAddr = netInterface.getInetAddresses(); enumIPAddr
-                            .hasMoreElements(); ) {
-                        InetAddress inetAddress = (InetAddress) enumIPAddr.nextElement();
-                        // 如果不是回环地址
-                        if (!inetAddress.isLoopbackAddress()) {
-                            ipAddress = inetAddress.getHostAddress().toString();
-                            if (!ipAddress.contains("::")) {// 如果不是ipV6的地址
-                                return ipAddress;
-                            }
-                        }
-                    }
-
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        return null;
     }
 
     public static Map<String, String> readArp() {

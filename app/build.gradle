@@ -12,6 +12,12 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    // 更新至Android Studio 3.3 gradle 4.10.1
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->  // each 改为 all
+            outputFileName = "MyTools-${buildType.name}-v${variant.versionName}.apk"
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
