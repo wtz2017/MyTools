@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.wtz.tools.R;
+import com.wtz.tools.test.WebViewActivity;
 import com.wtz.tools.test.adapter.IndexListAdapter;
 import com.wtz.tools.test.data.FragmentItem;
 import com.wtz.tools.view.BottomLoadListView;
@@ -126,6 +128,7 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
         mFragmentList.add(new FragmentItem("PopupWindow", PopupWindowFragment.class.getName()));
         mFragmentList.add(new FragmentItem("Dialog", DialogDemoFragment.class.getName()));
         mFragmentList.add(new FragmentItem("Notification", NotificationFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("WebView", WebViewActivity.class.getName(), true, WebViewActivity.class));
     }
 
     private void initView(View parent) {
@@ -151,6 +154,22 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
         mListView.requestFocus();
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Log.d(TAG, "onItemClick...position = " + position);
+        FragmentItem item = mFragmentList.get(position);
+        if (item.isActivity) {
+            gotoActivity(item);
+        } else {
+            gotoFragment(item);
+        }
+    }
+
+    private void gotoActivity(FragmentItem item) {
+        Intent i = new Intent(getActivity(), item.clazz);
+        startActivity(i);
+    }
+
     private void gotoFragment(FragmentItem item) {
         try {
             Log.d(TAG, "gotoFragment...item class name = " + item.fragmentClassName);
@@ -165,9 +184,4 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
         }
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.d(TAG, "onItemClick...position = " + position);
-        gotoFragment(mFragmentList.get(position));
-    }
 }

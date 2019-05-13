@@ -7,6 +7,13 @@ public class FragmentItem {
         this.fragmentClassName = fragmentClassName;
     }
 
+    public FragmentItem(String name, String fragmentClassName, boolean isActivity, Class clazz) {
+        this.name = name;
+        this.fragmentClassName = fragmentClassName;
+        this.isActivity = isActivity;
+        this.clazz = clazz;
+    }
+
     public String name;
     
     /**
@@ -14,6 +21,10 @@ public class FragmentItem {
      * i.e. FileUtilFragment.class.getName()
      */
     public String fragmentClassName;
+
+    public boolean isActivity;
+
+    public Class clazz;
 
     @Override
     public String toString() {
