@@ -9,6 +9,8 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
 
+import com.wtz.tools.utils.SystemInfoUtils;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -325,19 +327,19 @@ public class NetworkDeviceUtils {
                         }
                     }
                     if (TextUtils.isEmpty(ip) || !isIpString(ip)) {
-                        ip = androidGetProp("dhcp.wlan0.ipaddress", "");
+                        ip = SystemInfoUtils.getAndroidProp("dhcp.wlan0.ipaddress", "");
                     }
                     if (TextUtils.isEmpty(mask)) {
-                        mask = androidGetProp("dhcp.wlan0.mask", "");
+                        mask = SystemInfoUtils.getAndroidProp("dhcp.wlan0.mask", "");
                     }
                     if (TextUtils.isEmpty(gateway)) {
-                        gateway = androidGetProp("dhcp.wlan0.gateway", "");
+                        gateway = SystemInfoUtils.getAndroidProp("dhcp.wlan0.gateway", "");
                     }
                     if (TextUtils.isEmpty(dns1)) {
-                        dns1 = androidGetProp("dhcp.wlan0.dns1", "");
+                        dns1 = SystemInfoUtils.getAndroidProp("dhcp.wlan0.dns1", "");
                     }
                     if (TextUtils.isEmpty(dns2)) {
-                        dns2 = androidGetProp("dhcp.wlan0.dns2", "");
+                        dns2 = SystemInfoUtils.getAndroidProp("dhcp.wlan0.dns2", "");
                     }
                     break;
                 case ConnectivityManager.TYPE_ETHERNET:
@@ -395,19 +397,19 @@ public class NetworkDeviceUtils {
                     } catch (Exception e) {
                     }
                     if (TextUtils.isEmpty(ip) || !isIpString(ip)) {
-                        ip = androidGetProp("dhcp.eth0.ipaddress", "");
+                        ip = SystemInfoUtils.getAndroidProp("dhcp.eth0.ipaddress", "");
                     }
                     if (TextUtils.isEmpty(mask)) {
-                        mask = androidGetProp("dhcp.eth0.mask", "");
+                        mask = SystemInfoUtils.getAndroidProp("dhcp.eth0.mask", "");
                     }
                     if (TextUtils.isEmpty(gateway)) {
-                        gateway = androidGetProp("dhcp.eth0.gateway", "");
+                        gateway = SystemInfoUtils.getAndroidProp("dhcp.eth0.gateway", "");
                     }
                     if (TextUtils.isEmpty(dns1)) {
-                        dns1 = androidGetProp("dhcp.eth0.dns1", "");
+                        dns1 = SystemInfoUtils.getAndroidProp("dhcp.eth0.dns1", "");
                     }
                     if (TextUtils.isEmpty(dns2)) {
-                        dns2 = androidGetProp("dhcp.eth0.dns2", "");
+                        dns2 = SystemInfoUtils.getAndroidProp("dhcp.eth0.dns2", "");
                     }
 
                     break;
@@ -550,18 +552,6 @@ public class NetworkDeviceUtils {
             }
         }
         return "";
-    }
-
-    public static String androidGetProp(String key, String defaultValue) {
-        String value = defaultValue;
-        try {
-            Class<?> c = Class.forName("android.os.SystemProperties");
-            Method get = c.getMethod("get", String.class, String.class);
-            value = (String) (get.invoke(c, key, ""));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return value;
     }
 
     public static Map<String, String> readArp() {

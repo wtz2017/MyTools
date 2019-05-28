@@ -30,12 +30,13 @@ import java.util.TimeZone;
 
 public class SystemInfoUtils {
 
-    public static String androidGetProp(String key, String defaultValue) {
+    public static String getAndroidProp(String key, String defaultValue) {
         String value = defaultValue;
         try {
             Class<?> c = Class.forName("android.os.SystemProperties");
-            Method get = c.getMethod("get", String.class, String.class);
-            value = (String) (get.invoke(c, key, ""));
+            Method get = c.getDeclaredMethod("get", String.class, String.class);
+            get.setAccessible(true);
+            value = (String) (get.invoke(c, key, defaultValue));
         } catch (Exception e) {
             e.printStackTrace();
         }

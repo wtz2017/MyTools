@@ -18,6 +18,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.wtz.tools.R;
 import com.wtz.tools.test.WebViewActivity;
+import com.wtz.tools.test.aac.view.CityIpActivity;
 import com.wtz.tools.test.adapter.IndexListAdapter;
 import com.wtz.tools.test.data.FragmentItem;
 import com.wtz.tools.view.BottomLoadListView;
@@ -129,6 +130,7 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
         mFragmentList.add(new FragmentItem("Dialog", DialogDemoFragment.class.getName()));
         mFragmentList.add(new FragmentItem("Notification", NotificationFragment.class.getName()));
         mFragmentList.add(new FragmentItem("WebView", WebViewActivity.class.getName(), true, WebViewActivity.class));
+        mFragmentList.add(new FragmentItem("CityIp", CityIpActivity.class.getName(), true, CityIpActivity.class));
     }
 
     private void initView(View parent) {
