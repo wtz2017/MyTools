@@ -130,6 +130,7 @@ public class SurfaceIjkVideoView extends SurfaceView {
 
         public void surfaceDestroyed(SurfaceHolder holder) {
             Log.i(TAG, "surfaceDestroyed");
+            mSurfaceHolder = null;
             if (mMediaPlayer != null) {
                 mMediaPlayer.reset();
                 mMediaPlayer.release();

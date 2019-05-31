@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.wtz.tools.R;
+import com.wtz.tools.test.FileChooserActivity;
 import com.wtz.tools.test.WebViewActivity;
 import com.wtz.tools.test.aac.view.CityIpActivity;
 import com.wtz.tools.test.adapter.IndexListAdapter;
@@ -131,6 +132,7 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
         mFragmentList.add(new FragmentItem("Notification", NotificationFragment.class.getName()));
         mFragmentList.add(new FragmentItem("WebView", WebViewActivity.class.getName(), true, WebViewActivity.class));
         mFragmentList.add(new FragmentItem("CityIp", CityIpActivity.class.getName(), true, CityIpActivity.class));
+        mFragmentList.add(new FragmentItem("文件选择", FileChooserActivity.class.getName(), true, FileChooserActivity.class));
     }
 
     private void initView(View parent) {

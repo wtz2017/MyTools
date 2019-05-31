@@ -14,7 +14,12 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.wtz.tools.R;
+import com.wtz.tools.utils.file.FileChooser;
 import com.wtz.tools.view.SurfaceIjkVideoView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
@@ -33,6 +38,19 @@ public class IjkPlayerFragment extends Fragment {
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
 
+    private int mSelectRequestCode;
+    private String mVideoPath = VIDEO_PATH;
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onChooseResult(FileChooser.ChooseResult chooseResult) {
+        Log.d(TAG, "onResult requestCode=" + chooseResult.getRequestCode()
+                + "; filePath=" + chooseResult.getFilePath());
+        if (chooseResult.getRequestCode() == mSelectRequestCode) {
+            mVideoPath = chooseResult.getFilePath();
+            videoView.openVideo(mVideoPath);
+        }
+    }
+
     @Override
     public void onAttach(Activity activity) {
         Log.d(TAG, "onAttach");
@@ -43,6 +61,7 @@ public class IjkPlayerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -50,6 +69,13 @@ public class IjkPlayerFragment extends Fragment {
         Log.d(TAG, "onCreateView");
 
         View view = inflater.inflate(R.layout.fragment_ijkplayer, container, false);
+
+        view.findViewById(R.id.btn_select_video).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSelectRequestCode = FileChooser.chooseVideo(getActivity());
+            }
+        });
 
         final ImageButton playPause = view.findViewById(R.id.ib_play_pause);
         final TextView currentTime = view.findViewById(R.id.tv_current_time);
@@ -74,7 +100,6 @@ public class IjkPlayerFragment extends Fragment {
                 playPause.setImageResource(R.drawable.play);
             }
         });
-        videoView.openVideo(VIDEO_PATH);
 
         playPause.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,12 +188,14 @@ public class IjkPlayerFragment extends Fragment {
     @Override
     public void onPause() {
         Log.d(TAG, "onPause");
+        videoView.pause();
         super.onPause();
     }
 
     @Override
     public void onStop() {
         Log.d(TAG, "onStop");
+        videoView.stop();
         super.onStop();
     }
 
@@ -183,6 +210,7 @@ public class IjkPlayerFragment extends Fragment {
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 

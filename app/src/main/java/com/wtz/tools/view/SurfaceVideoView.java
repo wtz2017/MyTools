@@ -121,6 +121,7 @@ public class SurfaceVideoView extends SurfaceView implements MediaPlayerControl 
 
         public void surfaceDestroyed(SurfaceHolder holder) {
             Log.i(TAG, "surfaceDestroyed");
+            mSurfaceHolder = null;
             if (mMediaPlayer != null) {
                 mMediaPlayer.reset();
                 mMediaPlayer.release();

@@ -2,7 +2,7 @@ package com.wtz.tools.utils.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.wtz.tools.utils.FileUtil;
+import com.wtz.tools.utils.file.FileUtil;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;

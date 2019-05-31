@@ -33,10 +33,18 @@
         <!--背景变暗-->
         <item name="android:backgroundDimEnabled">true</item>
     </style>
+    
     <!--对话框动画-->
+    <!--Android Studio 3.0 已不支持@开头使用android自带的属性,只要把@符号删掉即可-->
     <style name="normalDialogAnim" parent="android:Animation">
-        <item name="@android:windowEnterAnimation">@anim/normal_dialog_enter</item>
-        <item name="@android:windowExitAnimation">@anim/normal_dialog_exit</item>
+        <item name="android:windowEnterAnimation">@anim/normal_dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/normal_dialog_exit</item>
+    </style>
+
+    <style name="FileChooserTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
 </resources>

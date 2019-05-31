@@ -1,4 +1,4 @@
-package com.wtz.tools.utils;
+package com.wtz.tools.utils.file;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
