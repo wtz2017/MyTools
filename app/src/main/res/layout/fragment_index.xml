@@ -1,25 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.wtz.tools.view.ListScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sv_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
-    <com.wtz.tools.view.BottomLoadListView
-        android:id="@+id/lv_index_list"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        android:cacheColorHint="@android:color/transparent"
-        android:divider="@android:color/black"
-        android:dividerHeight="1dp"
-        android:fadingEdge="none"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:listSelector="@android:color/transparent"
-        android:scrollbarThumbVertical="@drawable/scroll_bar_vertical"
-        android:scrollingCache="false"
-        android:smoothScrollbar="true"
-        app:footer="@layout/bottom_load_list_footer">
-    </com.wtz.tools.view.BottomLoadListView>
+        android:orientation="vertical">
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/iv_home_bg"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_200"
+            android:scaleType="fitXY"
+            android:src="@drawable/home_bg" />
+
+        <View
+            android:id="@+id/v_title"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_60"
+            android:background="#4876FF" />
+
+        <com.wtz.tools.view.BottomLoadListView
+            android:id="@+id/lv_index_list"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_600"
+            android:layout_gravity="center_horizontal"
+            android:cacheColorHint="@android:color/transparent"
+            android:divider="@android:color/black"
+            android:dividerHeight="1dp"
+            android:fadingEdge="none"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:listSelector="@android:color/transparent"
+            android:scrollbarThumbVertical="@drawable/scroll_bar_vertical"
+            android:scrollingCache="false"
+            android:smoothScrollbar="true"
+            app:footer="@layout/bottom_load_list_footer"></com.wtz.tools.view.BottomLoadListView>
+
+    </LinearLayout>
+</com.wtz.tools.view.ListScrollView>

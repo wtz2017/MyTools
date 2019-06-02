@@ -11,10 +11,13 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.wtz.tools.R;
 import com.wtz.tools.test.FileChooserActivity;
@@ -22,15 +25,21 @@ import com.wtz.tools.test.WebViewActivity;
 import com.wtz.tools.test.aac.view.CityIpActivity;
 import com.wtz.tools.test.adapter.IndexListAdapter;
 import com.wtz.tools.test.data.FragmentItem;
+import com.wtz.tools.utils.ScreenUtils;
+import com.wtz.tools.utils.SystemInfoUtils;
 import com.wtz.tools.view.BottomLoadListView;
+import com.wtz.tools.view.ListScrollView;
 
-public class IndexFragment extends Fragment implements OnItemClickListener{
+public class IndexFragment extends Fragment implements OnItemClickListener, View.OnTouchListener {
     private final static String TAG = IndexFragment.class.getName();
     
     private ArrayList<FragmentItem> mFragmentList;
-    
+
+    private ListScrollView mScrollView;
     private BottomLoadListView mListView;
     private IndexListAdapter mListAdapter;
+
+    private static final float HOME_BG_WH_SCALE = 1.64f;
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
     
@@ -53,8 +62,30 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
         Log.d(TAG, "onCreateView");
 
         View view = inflater.inflate(R.layout.fragment_index, container, false);
-        
-        initView(view);
+
+        mScrollView = view.findViewById(R.id.sv_root);
+        mScrollView.setOnTouchListener(this);
+        int[] wh = SystemInfoUtils.getScreenPixels(getActivity());
+        int headHeight = (int) (wh[0] / HOME_BG_WH_SCALE);
+        mScrollView.setHeadHeight(headHeight);
+
+        ImageView homeBg = view.findViewById(R.id.iv_home_bg);
+        LinearLayout.LayoutParams homeLp = (LinearLayout.LayoutParams) homeBg.getLayoutParams();
+        homeLp.height = headHeight;
+        homeBg.setLayoutParams(homeLp);
+
+        int titleHeight = ScreenUtils.dip2px(getActivity(), 60);
+        View titleView = view.findViewById(R.id.v_title);
+        LinearLayout.LayoutParams titleLp = (LinearLayout.LayoutParams) titleView.getLayoutParams();
+        titleLp.height = titleHeight;
+        titleView.setLayoutParams(titleLp);
+
+        mListView = (BottomLoadListView) view.findViewById(R.id.lv_index_list);
+        mScrollView.setListView(mListView);
+        LinearLayout.LayoutParams listLp = (LinearLayout.LayoutParams) mListView.getLayoutParams();
+        listLp.height = wh[1] - titleHeight;
+        mListView.setLayoutParams(listLp);
+        initListViewData(view);
 
         return view;
     }
@@ -135,9 +166,8 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
         mFragmentList.add(new FragmentItem("文件选择", FileChooserActivity.class.getName(), true, FileChooserActivity.class));
     }
 
-    private void initView(View parent) {
+    private void initListViewData(View parent) {
         mListAdapter = new IndexListAdapter(getActivity(), mFragmentList);
-        mListView = (BottomLoadListView) parent.findViewById(R.id.lv_index_list);
         mListView.setAdapter(mListAdapter);
         mListView.setOnItemClickListener(this);
         mListView.setOnBottomLoadListener(new BottomLoadListView.OnBottomLoadListener() {
@@ -186,6 +216,36 @@ public class IndexFragment extends Fragment implements OnItemClickListener{
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private int mLastX;
+    private int mLastY;
+    @Override
+    public boolean onTouch(View view, MotionEvent event) {
+        if (view.getId() == R.id.sv_root) {
+            int x = (int) event.getX();
+            int y = (int) event.getY();
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    view.getParent().requestDisallowInterceptTouchEvent(true);
+
+                    break;
+                case MotionEvent.ACTION_MOVE:
+
+                    int xDiff = Math.abs(x - mLastX);
+                    int yDiff = Math.abs(y - mLastY);
+
+                    if (xDiff < yDiff) {
+                        view.getParent().requestDisallowInterceptTouchEvent(false);
+                    } else {
+                        view.getParent().requestDisallowInterceptTouchEvent(true);
+                    }
+                    break;
+            }
+            mLastX = x;
+            mLastY = y;
+        }
+        return false;
     }
 
 }
