@@ -11,7 +11,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -30,7 +29,7 @@ import com.wtz.tools.utils.SystemInfoUtils;
 import com.wtz.tools.view.BottomLoadListView;
 import com.wtz.tools.view.ListScrollView;
 
-public class IndexFragment extends Fragment implements OnItemClickListener, View.OnTouchListener {
+public class IndexFragment extends Fragment implements OnItemClickListener {
     private final static String TAG = IndexFragment.class.getName();
     
     private ArrayList<FragmentItem> mFragmentList;
@@ -42,6 +41,8 @@ public class IndexFragment extends Fragment implements OnItemClickListener, View
     private static final float HOME_BG_WH_SCALE = 1.64f;
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
+
+    private boolean isFirstShow = true;
     
     @Override
     public void onAttach(Activity activity) {
@@ -64,9 +65,9 @@ public class IndexFragment extends Fragment implements OnItemClickListener, View
         View view = inflater.inflate(R.layout.fragment_index, container, false);
 
         mScrollView = view.findViewById(R.id.sv_root);
-        mScrollView.setOnTouchListener(this);
         int[] wh = SystemInfoUtils.getScreenPixels(getActivity());
         int headHeight = (int) (wh[0] / HOME_BG_WH_SCALE);
+        Log.d(TAG, "headHeight=" + headHeight);
         mScrollView.setHeadHeight(headHeight);
 
         ImageView homeBg = view.findViewById(R.id.iv_home_bg);
@@ -75,6 +76,7 @@ public class IndexFragment extends Fragment implements OnItemClickListener, View
         homeBg.setLayoutParams(homeLp);
 
         int titleHeight = ScreenUtils.dip2px(getActivity(), 60);
+        Log.d(TAG, "titleHeight=" + titleHeight);
         View titleView = view.findViewById(R.id.v_title);
         LinearLayout.LayoutParams titleLp = (LinearLayout.LayoutParams) titleView.getLayoutParams();
         titleLp.height = titleHeight;
@@ -83,7 +85,9 @@ public class IndexFragment extends Fragment implements OnItemClickListener, View
         mListView = (BottomLoadListView) view.findViewById(R.id.lv_index_list);
         mScrollView.setListView(mListView);
         LinearLayout.LayoutParams listLp = (LinearLayout.LayoutParams) mListView.getLayoutParams();
-        listLp.height = wh[1] - titleHeight;
+        int statusBarHeight = ScreenUtils.getStatusBarHeight(getActivity());
+        listLp.height = wh[1] - statusBarHeight - titleHeight;
+        Log.d(TAG, "statusBar Height=" + statusBarHeight + ",list Height=" + listLp.height);
         mListView.setLayoutParams(listLp);
         initListViewData(view);
 
@@ -99,6 +103,16 @@ public class IndexFragment extends Fragment implements OnItemClickListener, View
     @Override
     public void onResume() {
         Log.d(TAG, "onResume");
+        if (isFirstShow) {
+            // 解决首次进入页面ScrollView内容不在顶部问题
+            isFirstShow = false;
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mScrollView.scrollTo(0, 0);
+                }
+            }, 0);
+        }
         super.onResume();
     }
 
@@ -216,36 +230,6 @@ public class IndexFragment extends Fragment implements OnItemClickListener, View
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private int mLastX;
-    private int mLastY;
-    @Override
-    public boolean onTouch(View view, MotionEvent event) {
-        if (view.getId() == R.id.sv_root) {
-            int x = (int) event.getX();
-            int y = (int) event.getY();
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    view.getParent().requestDisallowInterceptTouchEvent(true);
-
-                    break;
-                case MotionEvent.ACTION_MOVE:
-
-                    int xDiff = Math.abs(x - mLastX);
-                    int yDiff = Math.abs(y - mLastY);
-
-                    if (xDiff < yDiff) {
-                        view.getParent().requestDisallowInterceptTouchEvent(false);
-                    } else {
-                        view.getParent().requestDisallowInterceptTouchEvent(true);
-                    }
-                    break;
-            }
-            mLastX = x;
-            mLastY = y;
-        }
-        return false;
     }
 
 }

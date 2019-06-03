@@ -1,6 +1,7 @@
 package com.wtz.tools.utils;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -72,6 +73,25 @@ public class ScreenUtils {
     public static int dip2px(Context context, float dip) {
         float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dip * scale + 0.5f);
+    }
+
+    /**
+     * 获取状态栏高度
+     * @param context
+     * @return
+     */
+    public static int getStatusBarHeight(Context context) {
+        int result = 0;
+        if (context == null) return result;
+
+        Resources resources = context.getResources();
+        if (resources == null) return result;
+
+        int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = resources.getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 
 }
