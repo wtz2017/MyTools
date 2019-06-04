@@ -4,9 +4,30 @@
         android:id="@+id/group1"
         android:checkableBehavior="single">
         <item
-            android:id="@+id/access_point"
+            android:id="@+id/basic_info"
+            android:icon="@drawable/information_outline"
+            android:title="概要"/>
+        <item
+            android:id="@+id/version"
+            android:icon="@drawable/progress_download"
+            android:title="版本"/>
+        <item
+            android:id="@+id/chip"
+            android:icon="@drawable/chip"
+            android:title="芯片"/>
+        <item
+            android:id="@+id/storage"
+            android:icon="@drawable/sd"
+            android:title="存储"/>
+        <item
+            android:id="@+id/net"
             android:icon="@drawable/access_point"
-            android:title="access_point"/>
+            android:title="网络"/>
+    </group>
+
+    <group
+        android:id="@+id/group2"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/account"
             android:icon="@drawable/account"
@@ -22,7 +43,7 @@
     </group>
 
     <group
-        android:id="@+id/group2"
+        android:id="@+id/group3"
         android:checkableBehavior="single">
         <item
             android:id="@+id/amazon_drive"

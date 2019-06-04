@@ -149,34 +149,34 @@ public class IndexFragment extends Fragment implements OnItemClickListener {
     
     private void initFragmentListData() {
         mFragmentList = new ArrayList<FragmentItem>();
+        mFragmentList.add(new FragmentItem("DrawerLayout", DrawerLayoutFragment.class.getName()));
         mFragmentList.add(new FragmentItem("通用工具测试", CommonUtilFragment.class.getName()));
-        mFragmentList.add(new FragmentItem("SurfaceView", SurfaceViewFragment.class.getName()));
         mFragmentList.add(new FragmentItem("CameraView", CameraViewFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("SurfaceView", SurfaceViewFragment.class.getName()));
         mFragmentList.add(new FragmentItem("SurfaceVideoView", SurfaceVideoViewFragment.class.getName()));
         mFragmentList.add(new FragmentItem("TextureVideoView", TextureVideoViewFragment.class.getName()));
-        mFragmentList.add(new FragmentItem("IjkPlayer", IjkPlayerFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("SurfaceIjkVideoView", IjkPlayerFragment.class.getName()));
         mFragmentList.add(new FragmentItem("图片框架", ImageFrameworkFragment.class.getName()));
         mFragmentList.add(new FragmentItem("GridViewLayout", GridViewFragment.class.getName()));
-        mFragmentList.add(new FragmentItem("RecyclerViewItemDecoration", RecyclerViewItemDecorationFragment.class.getName()));
-        mFragmentList.add(new FragmentItem("RecyclerLoadMore", RecyclerLoadMoreFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("ViewPager", ViewPagerFragment.class.getName()));
         mFragmentList.add(new FragmentItem("GalleryRecyclerView", GalleryRecyclerViewFragment.class.getName()));
         mFragmentList.add(new FragmentItem("HorizontalScrollSlideView", HorizontalScrollFragment.class.getName()));
-        mFragmentList.add(new FragmentItem("ViewPager", ViewPagerFragment.class.getName()));
-        mFragmentList.add(new FragmentItem("DrawerLayout", DrawerLayoutFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("RecyclerViewItemDecoration", RecyclerViewItemDecorationFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("RecyclerLoadMore", RecyclerLoadMoreFragment.class.getName()));
         mFragmentList.add(new FragmentItem("下拉刷新", PullRefreshFragment.class.getName()));
         mFragmentList.add(new FragmentItem("左拉抽屉", SwipeLayoutFragment.class.getName()));
         mFragmentList.add(new FragmentItem("Seekbar", SeekbarAsyncTaskFragment.class.getName()));
         mFragmentList.add(new FragmentItem("LoadingProgress", LoadingProgressFragment.class.getName()));
         mFragmentList.add(new FragmentItem("LoadingTextView", LoadingTextViewFragment.class.getName()));
         mFragmentList.add(new FragmentItem("SwitchButton", SwitchButtonFragment.class.getName()));
-        mFragmentList.add(new FragmentItem("打开帷幕", PullCurtainFragment.class.getName()));
         mFragmentList.add(new FragmentItem("动画演示", AnimationFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("打开帷幕", PullCurtainFragment.class.getName()));
         mFragmentList.add(new FragmentItem("折叠日历", CollapseCalendarFragment.class.getName()));
         mFragmentList.add(new FragmentItem("PopupWindow", PopupWindowFragment.class.getName()));
         mFragmentList.add(new FragmentItem("Dialog", DialogDemoFragment.class.getName()));
         mFragmentList.add(new FragmentItem("Notification", NotificationFragment.class.getName()));
         mFragmentList.add(new FragmentItem("WebView", WebViewActivity.class.getName(), true, WebViewActivity.class));
-        mFragmentList.add(new FragmentItem("CityIp", CityIpActivity.class.getName(), true, CityIpActivity.class));
+        mFragmentList.add(new FragmentItem("IP(AAC架构)", CityIpActivity.class.getName(), true, CityIpActivity.class));
         mFragmentList.add(new FragmentItem("文件选择", FileChooserActivity.class.getName(), true, FileChooserActivity.class));
     }
 

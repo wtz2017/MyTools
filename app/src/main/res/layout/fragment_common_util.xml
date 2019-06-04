@@ -2,14 +2,44 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="3dp" >
+    android:layout_margin="3dp"
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/tv1"
+        android:id="@+id/tv_okhttpwebsocket"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="OkhttpWebSocket"
         android:textColor="#ff000000"
-        android:textSize="21sp" />
+        android:textSize="22sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/et_send_websocket"
+            android:layout_width="0dp"
+            android:textColor="#ff000000"
+            android:textSize="22sp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btn_send_websocket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:text="发送" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_received_websocket"
+        android:textColor="#ff000000"
+        android:textSize="22sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

@@ -3,27 +3,37 @@ package com.wtz.tools.test.fragment;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.wtz.tools.R;
 import com.wtz.tools.test.data.FragmentItem;
-import com.wtz.tools.utils.StorageUtil;
 import com.wtz.tools.utils.data_transfer_format.XmlDemo;
 import com.wtz.tools.utils.event.RxBus;
 import com.wtz.tools.utils.event.RxBusFlowable;
 import com.wtz.tools.utils.event.RxBusRelay;
 import com.wtz.tools.utils.network.OkhttpWebSocket;
 
+import org.w3c.dom.Text;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+
 public class CommonUtilFragment extends Fragment {
     private static final String TAG = CommonUtilFragment.class.getSimpleName();
     
-    private TextView tv1;
     private String TEST_WEB_SOCKET_URL = "ws://echo.websocket.org";
     private OkhttpWebSocket mWebSocket;
+
+    private TextView mWebsocketMsgView;
+    private EditText mWebsocketMsgEdit;
+
+    private Disposable mDisposableMsg;
 
     @Override
     public void onAttach(Activity activity) {
@@ -35,14 +45,26 @@ public class CommonUtilFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        RxBus.getInstance().send(new FragmentItem("haha", "haha-class"));
-        RxBusFlowable.getInstance().send(new FragmentItem("haha", "haha-class"));
-        RxBusRelay.getInstance().send(new FragmentItem("haha", "haha-class"));
+
+        mDisposableMsg = RxBus.registerOnMainThread(OkhttpWebSocket.WebsocketMsg.class, new Consumer<OkhttpWebSocket.WebsocketMsg>() {
+            @Override
+            public void accept(OkhttpWebSocket.WebsocketMsg websocketMsg) throws Exception {
+                if (mWebsocketMsgView != null && websocketMsg != null) {
+                    mWebsocketMsgView.setText(websocketMsg.content);
+                }
+            }
+        });
 
         // 需要在子线程里做
         mWebSocket = new OkhttpWebSocket(getActivity(), TEST_WEB_SOCKET_URL);
         mWebSocket.connect();
 
+        // RxBus test
+        RxBus.getInstance().send(new FragmentItem("haha", "haha-class"));
+        RxBusFlowable.getInstance().send(new FragmentItem("haha", "haha-class"));
+        RxBusRelay.getInstance().send(new FragmentItem("haha", "haha-class"));
+
+        // xml parse test
         XmlDemo.test(getActivity());
     }
 
@@ -52,33 +74,16 @@ public class CommonUtilFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_common_util, container, false);
         
-        tv1 = (TextView) view.findViewById(R.id.tv1);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("getTotalRunMemorySize = ");
-        stringBuilder.append(StorageUtil.formatFileSize(StorageUtil.getTotalRunMemorySize(getActivity()), false));
-        stringBuilder.append("\r\n");
-        
-        stringBuilder.append("getAvailableRunMemory = ");
-        stringBuilder.append(StorageUtil.formatFileSize(StorageUtil.getAvailableRunMemory(getActivity()), false));
-        stringBuilder.append("\r\n");
-        
-        stringBuilder.append("getTotalExternalMemorySize = ");
-        stringBuilder.append(StorageUtil.formatFileSize(StorageUtil.getTotalExternalMemorySize(), false));
-        stringBuilder.append("\r\n");
-        
-        stringBuilder.append("getAvailableExternalMemorySize = ");
-        stringBuilder.append(StorageUtil.formatFileSize(StorageUtil.getAvailableExternalMemorySize(), false));
-        stringBuilder.append("\r\n");
-        
-        stringBuilder.append("getTotalInternalMemorySize = ");
-        stringBuilder.append(StorageUtil.formatFileSize(StorageUtil.getTotalInternalMemorySize(), false));
-        stringBuilder.append("\r\n");
-        
-        stringBuilder.append("getAvailableInternalMemorySize = ");
-        stringBuilder.append(StorageUtil.formatFileSize(StorageUtil.getAvailableInternalMemorySize(), false));
-        stringBuilder.append("\r\n");
-        
-        tv1.setText(stringBuilder.toString());
+        mWebsocketMsgView = view.findViewById(R.id.tv_received_websocket);
+        mWebsocketMsgEdit = view.findViewById(R.id.et_send_websocket);
+        view.findViewById(R.id.btn_send_websocket).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String content = mWebsocketMsgEdit.getText().toString();
+                if (TextUtils.isEmpty(content)) return;
+                mWebSocket.send(content);
+            }
+        });
 
         return view;
     }
@@ -116,6 +121,7 @@ public class CommonUtilFragment extends Fragment {
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
+        RxBus.unregister(mDisposableMsg);
         mWebSocket.destroy();
         super.onDestroy();
     }

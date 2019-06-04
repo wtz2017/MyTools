@@ -408,6 +408,67 @@ public class SystemInfoUtils {
         return Long.parseLong(result) * 1024;
     }
 
+    public static String[] readRAMFromFile() {
+        String path = "/proc/meminfo";
+        FileInputStream fis = null;
+        InputStreamReader isr = null;
+        BufferedReader br = null;
+        int num = 3;
+        int foundCount = 0;
+        String[] ramList = new String[num];
+        try {
+            fis = new FileInputStream(new File(path));
+            isr = new InputStreamReader(fis);
+            br = new BufferedReader(isr);
+            String line = null;
+            while ((line = br.readLine()) != null && foundCount < num) {
+                if (line.indexOf("MemTotal") > -1) {
+                    ramList[0] = getRamValue(line);
+                    foundCount++;
+                } else if (line.indexOf("MemFree") > -1) {
+                    ramList[1] = getRamValue(line);
+                    foundCount++;
+                } else if (line.indexOf("MemAvailable") > -1) {
+                    ramList[2] = getRamValue(line);
+                    foundCount++;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (br != null) {
+                    br.close();
+                }
+                if (isr != null) {
+                    isr.close();
+                }
+                if (fis != null) {
+                    fis.close();
+                }
+            } catch (IOException e) {
+                // just ignore
+                e.printStackTrace();
+            }
+        }
+        return ramList;
+    }
+
+    private static String getRamValue(String line) {
+        String result;
+        int start = line.indexOf(":") + 1;
+        int end = line.indexOf("kB");
+        result = line.substring(start,
+                end);
+        //去空格
+        result = result.trim();
+        long sizeKb = Long.parseLong(result);
+        result = (sizeKb / 1024) + "MB";
+        return result;
+    }
+
     /**
      * 获取可用内存信息
      *

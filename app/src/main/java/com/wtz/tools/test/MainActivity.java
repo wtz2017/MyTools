@@ -40,6 +40,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate...savedInstanceState = " + savedInstanceState);
+        // Make sure this line comes before calling super.onCreate().
+        setTheme(R.style.AppTheme);// 从启动主题切换恢复正常主题
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main);

@@ -3,6 +3,8 @@ package com.wtz.tools.utils.network;
 import android.content.Context;
 import android.util.Log;
 
+import com.wtz.tools.utils.event.RxBus;
+
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -26,6 +28,14 @@ public class OkhttpWebSocket {
      * 1004/1005/1006/1012-2999 is reserved and may not be used
      */
     private static final int CLOSE_CODE_NORMAL = 4567;
+
+    public static class WebsocketMsg {
+        public String content;
+
+        public WebsocketMsg(String content) {
+            this.content = content;
+        }
+    }
 
     public static void test(Context context) {
         OkhttpWebSocket webSocket = new OkhttpWebSocket(context, "ws://echo.websocket.org");
@@ -64,6 +74,10 @@ public class OkhttpWebSocket {
     }
 
     public synchronized void send(String message) {
+        if (!NetworkDeviceUtils.isNetworkConnect(mContext)) {
+            RxBus.getInstance().send(new WebsocketMsg("Please connect network!"));
+            return;
+        }
         if (mWebSocket != null) {
             mWebSocket.send(message);
         }
@@ -102,12 +116,13 @@ public class OkhttpWebSocket {
             isConnecting = false;
 
             // TODO: 2019/1/2 test ------
-            send("hello!");
+//            send("hello!");
         }
 
         @Override
         public void onMessage(WebSocket webSocket, String text) {
             Log.d(TAG,"receive String message: " + text);
+            RxBus.getInstance().send(new WebsocketMsg(text));
         }
 
         @Override
