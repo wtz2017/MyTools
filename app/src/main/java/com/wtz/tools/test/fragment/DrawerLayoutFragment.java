@@ -13,6 +13,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.Formatter;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 
 import com.wtz.tools.R;
 import com.wtz.tools.utils.DateTimeUtil;
+import com.wtz.tools.utils.ScreenUtils;
 import com.wtz.tools.utils.SystemInfoUtils;
 import com.wtz.tools.utils.network.NetworkDeviceUtils;
 import com.wtz.tools.view.ToastUtils;
@@ -303,6 +305,15 @@ public class DrawerLayoutFragment extends Fragment {
         buffer.append(screenPixels[0] + "x" + screenPixels[1]);
         buffer.append("\r\n");
 
+        DisplayMetrics dm = ScreenUtils.getDisplayMetrics(getActivity());
+        buffer.append("每英寸像素个数:");
+        buffer.append(dm.densityDpi);
+        buffer.append("\r\n");
+
+        buffer.append("像素密度:");
+        buffer.append(dm.density);
+        buffer.append("\r\n");
+
         long bootPassTime = SystemClock.elapsedRealtime();
         buffer.append("已开机时间:");
         buffer.append(DateTimeUtil.changeRemainTimeToHms(bootPassTime));
@@ -371,7 +382,6 @@ public class DrawerLayoutFragment extends Fragment {
 
         buffer.append("◆外部存储可用大小:");
         buffer.append(Formatter.formatFileSize(getActivity(), SystemInfoUtils.getAvailableExternalStorageSize(getActivity())));
-        buffer.append("bytes");
         buffer.append("\r\n");
     }
 

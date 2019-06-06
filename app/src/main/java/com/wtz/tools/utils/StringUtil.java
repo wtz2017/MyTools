@@ -276,4 +276,19 @@ public class StringUtil {
     public static int hexStringToInt(String hex) throws Exception {
         return Integer.valueOf(hex, 16);
     }
+
+    /**
+     * 把不带冒号的 MAC 字串转成带冒号的 MAC
+     *
+     * @param mac 不带冒号的 MAC 字串
+     * @return
+     */
+    public static String  insertMacSeparator(String mac) {
+        if (mac == null || mac.length() != 12) return mac;
+
+        String regex = "(.{2})";
+        mac = mac.replaceAll(regex, "$1:");
+        return mac.substring(0, mac.length() - 1);
+    }
+
 }

@@ -1,10 +1,16 @@
 package com.wtz.tools.utils.data_transfer_format;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 在需要把类通过Gson转为json字符串时，类混淆后就变成abcde...之类的情形了，
@@ -70,6 +76,22 @@ public class JsonUtil {
         //创建JSONArray数组，并将json添加到数组
         JSONArray array = new JSONArray();
         array.put(json);
+    }
+
+    public class MacParams {
+        @SerializedName("macs")
+        public List<String> macs;
+    }
+
+    public void testList() {
+        MacParams macParams = new MacParams();
+        macParams.macs = new ArrayList<>();
+        macParams.macs.add("abc");
+        macParams.macs.add("de");
+        macParams.macs.add("ao");
+        Gson gson = new Gson();
+        Log.d("JsonUtil", gson.toJson(macParams));
+        // 结果是：{"macs":["abc","de","ao"]}
     }
 
 }
