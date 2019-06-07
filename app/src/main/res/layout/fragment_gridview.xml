@@ -2,19 +2,45 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="3dp" >
+    android:layout_margin="3dp"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:orientation="vertical">
 
-    <GridView
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_move_left"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="向左" />
+
+        <Button
+            android:id="@+id/btn_move_right"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="向右" />
+    </LinearLayout>
+
+    <!-- 在上述父控件LinearLayout中设置 clipChildren = false, clipToPadding = false, 避免边缘的子View放大时被父View遮挡 -->
+    <com.wtz.tools.view.ScaleGridView
         android:id="@+id/gridView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:horizontalSpacing="@dimen/dp_5"
         android:listSelector="@android:color/transparent"
-        android:nextFocusDown="@id/gridView"
         android:nextFocusLeft="@id/gridView"
         android:nextFocusRight="@id/gridView"
         android:nextFocusUp="@id/gridView"
+        android:nextFocusDown="@id/gridView"
         android:numColumns="3"
         android:verticalSpacing="@dimen/dp_5" />
 
