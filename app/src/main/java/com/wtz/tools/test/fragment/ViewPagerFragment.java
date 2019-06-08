@@ -1,5 +1,6 @@
 package com.wtz.tools.test.fragment;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -27,6 +28,13 @@ public class ViewPagerFragment extends Fragment {
     private ViewPager mOpViewPager;
     private int mPageIndex;
 
+    private LinearLayout mTopIndicatorLayout;
+    private View mTopIndicator;
+    private int mTopIndicatorLayoutWidth;
+    private int mTopIndicatorWidth;
+    private int mTopMoveXDistance;
+    private int mImageCount;
+
     @Override
     public void onAttach(Activity activity) {
         Log.d(TAG, "onAttach");
@@ -52,6 +60,9 @@ public class ViewPagerFragment extends Fragment {
         Log.d(TAG, "onCreateView");
 
         View view = inflater.inflate(R.layout.fragment_viewpager, container, false);
+
+        mTopIndicatorLayout = view.findViewById(R.id.top_indicator_layout);
+        mTopIndicator = view.findViewById(R.id.v_top_indicator);
 
         // 初始化图片切换索引圆点
         int size = mImageList.size();
@@ -94,15 +105,8 @@ public class ViewPagerFragment extends Fragment {
                 Log.d(TAG, "onPageSelected...position = " + position + ", last = " + mPageIndex);
                 int last = mPageIndex;
                 mPageIndex = position;
-                View lastPoint = pointViewList.get(last);
-                lastPoint.setBackgroundResource(R.drawable.img_index_unselect);
-                lastPoint.setScaleX(1f);
-                lastPoint.setScaleY(1f);
-
-                View currPoint = pointViewList.get(position);
-                currPoint.setBackgroundResource(R.drawable.img_index_select);
-                currPoint.setScaleX(1.267f);
-                currPoint.setScaleY(1.267f);
+                switchBotomPoints(position, last, pointViewList);
+                switchTopIndicator();
             }
 
             @Override
@@ -112,6 +116,33 @@ public class ViewPagerFragment extends Fragment {
         mOpViewPager.setCurrentItem(mPageIndex);
 
         return view;
+    }
+
+    private void switchTopIndicator() {
+        if (mTopIndicatorLayoutWidth == 0) {
+            mTopIndicatorLayoutWidth = mTopIndicatorLayout.getWidth();
+            mTopIndicatorWidth = mTopIndicator.getWidth();
+            mImageCount = mImageList.size();
+            mTopMoveXDistance = mTopIndicatorWidth + (mTopIndicatorLayoutWidth - mImageCount * mTopIndicatorWidth) / (mImageCount - 1);
+        }
+        // 设置每个index对应的x位置，不管向左向右都是x>=0
+        ObjectAnimator anim = ObjectAnimator.ofFloat(
+                mTopIndicator, "translationX",
+                mTopMoveXDistance * mPageIndex);
+        anim.setDuration(200);
+        anim.start();
+    }
+
+    private void switchBotomPoints(int position, int last, List<View> pointViewList) {
+        View lastPoint = pointViewList.get(last);
+        lastPoint.setBackgroundResource(R.drawable.img_index_unselect);
+        lastPoint.setScaleX(1f);
+        lastPoint.setScaleY(1f);
+
+        View currPoint = pointViewList.get(position);
+        currPoint.setBackgroundResource(R.drawable.img_index_select);
+        currPoint.setScaleX(1.267f);
+        currPoint.setScaleY(1.267f);
     }
 
     @Override

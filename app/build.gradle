@@ -15,6 +15,12 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                // 消除Room警告: Schema export directory is not provided to the annotation processor
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
     // 更新至Android Studio 3.3 gradle 4.10.1
     applicationVariants.all { variant ->
