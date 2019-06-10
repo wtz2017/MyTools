@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.wtz.tools.R;
+import com.wtz.tools.test.ActionBarActivity;
 import com.wtz.tools.test.FileChooserActivity;
 import com.wtz.tools.test.WebViewActivity;
 import com.wtz.tools.test.aac.view.CityIpActivity;
@@ -178,6 +179,7 @@ public class IndexFragment extends Fragment implements OnItemClickListener {
         mFragmentList.add(new FragmentItem("WebView", WebViewActivity.class.getName(), true, WebViewActivity.class));
         mFragmentList.add(new FragmentItem("IP(AAC架构)", CityIpActivity.class.getName(), true, CityIpActivity.class));
         mFragmentList.add(new FragmentItem("文件选择", FileChooserActivity.class.getName(), true, FileChooserActivity.class));
+        mFragmentList.add(new FragmentItem("ActionBar", ActionBarActivity.class.getName(), true, ActionBarActivity.class));
     }
 
     private void initListViewData(View parent) {

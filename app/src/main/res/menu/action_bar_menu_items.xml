@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/toolbar_action1"
+        android:icon="@drawable/history"
+        android:title="历史"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/toolbar_action2"
+        android:icon="@drawable/help_circle_outline"
+        android:title="帮助"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/toolbar_action3"
+        android:icon="@drawable/sync"
+        android:title="同步"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_seach"
+        android:icon="@drawable/magnify"
+        android:title="搜索"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView" />
+
+    <item
+        android:id="@+id/menu_item_share"
+        android:title="分享"
+        app:actionProviderClass="android.support.v7.widget.ShareActionProvider"
+        app:showAsAction="ifRoom" />
+
+</menu>

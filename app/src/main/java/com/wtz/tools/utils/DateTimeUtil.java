@@ -9,8 +9,7 @@ import java.util.Date;
 public class DateTimeUtil {
 
     /**
-     * @param format
-     *            e.g. "yy-MM-dd_HH-mm-ss"
+     * @param format e.g. "yy-MM-dd_HH-mm-ss"
      * @return DateTime
      */
     public static String getCurrentDateTime(String format) {
@@ -21,9 +20,9 @@ public class DateTimeUtil {
     }
 
     /**
-     * @param format
-     *            e.g. "yy-MM-dd_HH-mm-ss"
-     * @return DateTime
+     * @param date   指定的日期
+     * @param format 返回的日期格式 e.g."yyyy-MM-dd_HH-mm-ss"
+     * @return
      */
     public static String getSpecifiedDateTime(Date date, String format) {
         SimpleDateFormat df = new SimpleDateFormat(format);
@@ -32,10 +31,23 @@ public class DateTimeUtil {
     }
 
     /**
-     * @param dateString
-     *            e.g. "2016‐03‐03 14:28:02"
-     * @param format
-     *            e.g. "yyyy-MM-dd HH:mm:ss"
+     * @param timeMillis 指定的日期毫秒数
+     * @param format     返回的日期格式 e.g."yyyy-MM-dd_HH-mm-ss"
+     * @return
+     */
+    public static String getSpecifiedDateTime(String timeMillis, String format) {
+        try {
+            Date date = new Date(Long.parseLong(timeMillis));
+            return getSpecifiedDateTime(date, format);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * @param dateString e.g. "2016‐03‐03 14:28:02"
+     * @param format     e.g. "yyyy-MM-dd HH:mm:ss"
      * @return Date
      */
     public static Date changeStringToDate(String dateString, String format) {
@@ -50,9 +62,8 @@ public class DateTimeUtil {
 
     /**
      * 获取指定时间对应的毫秒数
-     * 
-     * @param time
-     *            "HH:mm:ss"
+     *
+     * @param time "HH:mm:ss"
      * @return
      */
     public static long getTimeMillis(String time) {
@@ -66,14 +77,12 @@ public class DateTimeUtil {
         }
         return 0;
     }
-    
+
     /**
      * 获取指定日期时间对应的毫秒数
      *
-     * @param dateTime
-     *            "2016-12-08 12:00:00"
-     * @param format
-     *            "yyyy-MM-dd HH:mm:ss"
+     * @param dateTime "2016-12-08 12:00:00"
+     * @param format   "yyyy-MM-dd HH:mm:ss"
      * @return
      */
     public static long getDateTimeMillis(String dateTime, String format) {
@@ -86,6 +95,7 @@ public class DateTimeUtil {
 
     /**
      * 把剩余毫秒数转化成“时:分:秒”字符串
+     *
      * @param timeMilli
      * @return
      */
@@ -110,9 +120,9 @@ public class DateTimeUtil {
     public static int getWeekOfYear(Calendar calendar) {
         int week = calendar.get(Calendar.WEEK_OF_YEAR);
         int day = calendar.get(Calendar.DAY_OF_WEEK);
-        if (day==1) {
+        if (day == 1) {
             // Calendar的周一实际为我们中国人的上周的星期七
-            week=week-1;
+            week = week - 1;
         }
         return week;
     }
@@ -131,9 +141,9 @@ public class DateTimeUtil {
         calendar.setTime(date);
         int week = calendar.get(Calendar.WEEK_OF_YEAR);
         int day = calendar.get(Calendar.DAY_OF_WEEK);
-        if (day==1) {
+        if (day == 1) {
             // Calendar的周一实际为我们中国人的上周的星期七
-            week=week-1;
+            week = week - 1;
         }
         return week;
     }
@@ -141,9 +151,9 @@ public class DateTimeUtil {
     public static int getWeekOfMonth(Calendar calendar) {
         int week = calendar.get(Calendar.WEEK_OF_MONTH);
         int day = calendar.get(Calendar.DAY_OF_WEEK);
-        if (day==1) {
+        if (day == 1) {
             // Calendar的周一实际为我们中国人的上周的星期七
-            week=week-1;
+            week = week - 1;
         }
         return week;
     }
@@ -162,20 +172,20 @@ public class DateTimeUtil {
         calendar.setTime(date);
         int week = calendar.get(Calendar.WEEK_OF_MONTH);
         int day = calendar.get(Calendar.DAY_OF_WEEK);
-        if (day==1) {
+        if (day == 1) {
             // Calendar的周一实际为我们中国人的上周的星期七
-            week=week-1;
+            week = week - 1;
         }
         return week;
     }
 
     public static int getDayOfWeek(Calendar calendar) {
         int day = calendar.get(Calendar.DAY_OF_WEEK);
-        if (day==1) {
+        if (day == 1) {
             // Calendar的周一实际为我们中国人的上周的星期七
-            day=7;
+            day = 7;
         } else {
-            day=day-1;
+            day = day - 1;
         }
         return day;
     }
@@ -193,20 +203,18 @@ public class DateTimeUtil {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         int day = calendar.get(Calendar.DAY_OF_WEEK);
-        if (day==1) {
+        if (day == 1) {
             // Calendar的周一实际为我们中国人的上周的星期七
-            day=7;
+            day = 7;
         } else {
-            day=day-1;
+            day = day - 1;
         }
         return day;
     }
-    
+
     /**
-     * @param dateStr
-     *            日期字符串
-     * @param formatStr
-     *            格式字符串
+     * @param dateStr   日期字符串
+     * @param formatStr 格式字符串
      * @return 日期字符串是否符合指定格式字符串
      */
     public static boolean isDateFormatValid(String dateStr, String formatStr) {

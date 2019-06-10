@@ -33,6 +33,7 @@
         <activity android:name=".test.aac.view.CityIpActivity"/>
         <activity android:name=".utils.file.FileChooser" android:theme="@style/FileChooserTheme"/>
         <activity android:name=".test.FileChooserActivity"/>
+        <activity android:name=".test.ActionBarActivity" android:theme="@style/ActionBarAppTheme"/>
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.wtz.tools.fileprovider"

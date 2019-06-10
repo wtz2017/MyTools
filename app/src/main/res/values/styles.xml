@@ -56,4 +56,25 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <style name="ActionBarAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+
+        <!-- toolbar（actionbar）颜色-->
+        <item name="colorPrimary">#4876FF</item>
+
+        <!-- 状态栏颜色 -->
+        <item name="colorPrimaryDark">#3A5FCD</item>
+
+        <!-- 窗口的背景颜色，标题栏下面所有地方的颜色 -->
+        <item name="android:windowBackground">@android:color/holo_blue_bright</item>
+         
+        <item name="actionOverflowMenuStyle">@style/MyMenuStyle</item>
+
+    </style>
+
+    <style name="MyMenuStyle" parent="@style/Widget.AppCompat.Light.PopupMenu.Overflow">
+        <item name="overlapAnchor">false</item>
+        <item name="android:popupBackground">?attr/colorPrimaryDark</item>
+        <item name="android:dropDownVerticalOffset">0dip</item>
+    </style>
 </resources>
