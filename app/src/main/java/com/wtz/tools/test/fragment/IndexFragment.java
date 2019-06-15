@@ -180,6 +180,7 @@ public class IndexFragment extends Fragment implements OnItemClickListener {
         mFragmentList.add(new FragmentItem("IP(AAC架构)", CityIpActivity.class.getName(), true, CityIpActivity.class));
         mFragmentList.add(new FragmentItem("文件选择", FileChooserActivity.class.getName(), true, FileChooserActivity.class));
         mFragmentList.add(new FragmentItem("ActionBar", ActionBarActivity.class.getName(), true, ActionBarActivity.class));
+        mFragmentList.add(new FragmentItem("屏保演示", ScreenSaverFragment.class.getName()));
     }
 
     private void initListViewData(View parent) {

@@ -10,6 +10,8 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
     <!-- uses-sdk:minSdkVersion 14 cannot be smaller than version 21 declared in library [tv.danmaku.ijk.media:ijkplayer-arm64:0.8.8] -->
     <uses-sdk tools:overrideLibrary="tv.danmaku.ijk.media.player_arm64" />
@@ -34,6 +36,10 @@
         <activity android:name=".utils.file.FileChooser" android:theme="@style/FileChooserTheme"/>
         <activity android:name=".test.FileChooserActivity"/>
         <activity android:name=".test.ActionBarActivity" android:theme="@style/ActionBarAppTheme"/>
+        <activity
+            android:name=".test.ScreenSaverActivity"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.wtz.tools.fileprovider"
