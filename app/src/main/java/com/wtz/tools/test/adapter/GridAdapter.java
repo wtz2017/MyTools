@@ -31,6 +31,15 @@ public class GridAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public boolean isInLastRow(int position, int columns) {
+        return getRow(getCount(), columns) == getRow(position + 1, columns);
+    }
+
+    public int getRow(int target, int columns) {
+        int quotient = target / columns;
+        return  (target % columns > 0) ? quotient + 1 : quotient ;
+    }
+
     @Override
     public int getCount() {
         return (mDataList == null) ? 0 : mDataList.size();
