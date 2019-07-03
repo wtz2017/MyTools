@@ -35,6 +35,19 @@ public class HttpUtils {
     private HttpUtils() {
     }
 
+    /**
+     * 获取重定向地址
+     * @param path
+     * @return
+     * @throws Exception
+     */
+    public static String getRedirectUrl(String path) throws Exception {
+        HttpURLConnection conn = (HttpURLConnection) new URL(path).openConnection();
+        conn.setInstanceFollowRedirects(false);
+        conn.setConnectTimeout(5000);
+        return conn.getHeaderField("Location");
+    }
+
     public static String postJson(String urlStr, Map<String, String> headers, byte[] body) throws Exception {
         Log.d(TAG, "http postJson: " + urlStr + "; headers: " + headers);
         if (TextUtils.isEmpty(urlStr) || body == null || body.length == 0) {
