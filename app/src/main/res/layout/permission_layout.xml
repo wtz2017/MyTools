@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btn_static_permission"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="静态权限" />
+
+    <Button
+        android:id="@+id/btn_runtime_permission"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="运行时权限" />
+
+    <Button
+        android:id="@+id/btn_write_settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WRITE_SETTINGS" />
+
+    <Button
+        android:id="@+id/btn_system_alert_window"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SYSTEM_ALERT_WINDOW" />
+
+    <Button
+        android:id="@+id/btn_install_packages"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="REQUEST_INSTALL_PACKAGES" />
+
+    <Button
+        android:id="@+id/btn_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NOTIFICATION" />
+
+    <Button
+        android:id="@+id/btn_notification_listener"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NOTIFICATION_LISTENER" />
+
+</LinearLayout>

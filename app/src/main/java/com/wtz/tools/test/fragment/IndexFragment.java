@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import com.wtz.tools.R;
 import com.wtz.tools.test.ActionBarActivity;
 import com.wtz.tools.test.FileChooserActivity;
+import com.wtz.tools.test.PermissionActivity;
 import com.wtz.tools.test.WebViewActivity;
 import com.wtz.tools.test.aac.view.CityIpActivity;
 import com.wtz.tools.test.adapter.IndexListAdapter;
@@ -181,6 +182,7 @@ public class IndexFragment extends Fragment implements OnItemClickListener {
         mFragmentList.add(new FragmentItem("文件选择", FileChooserActivity.class.getName(), true, FileChooserActivity.class));
         mFragmentList.add(new FragmentItem("ActionBar", ActionBarActivity.class.getName(), true, ActionBarActivity.class));
         mFragmentList.add(new FragmentItem("屏保演示", ScreenSaverFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("权限管理", PermissionActivity.class.getName(), true, PermissionActivity.class));
     }
 
     private void initListViewData(View parent) {

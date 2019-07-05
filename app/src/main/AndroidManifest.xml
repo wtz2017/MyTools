@@ -7,11 +7,16 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- uses-sdk:minSdkVersion 14 cannot be smaller than version 21 declared in library [tv.danmaku.ijk.media:ijkplayer-arm64:0.8.8] -->
     <uses-sdk tools:overrideLibrary="tv.danmaku.ijk.media.player_arm64" />
@@ -40,6 +45,7 @@
             android:name=".test.ScreenSaverActivity"
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity android:name=".test.PermissionActivity"/>
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.wtz.tools.fileprovider"
