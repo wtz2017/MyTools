@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <ListView
+        android:id="@+id/record_listview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1"
+        android:divider="@null"
+        android:dividerHeight="10dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:background="#ccc" />
+
+        <com.wtz.tools.recorder.AudioRecorderButton
+            android:id="@+id/id_recorder_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginBottom="7dp"
+            android:background="@drawable/button_not_record"
+            android:gravity="center"
+            android:minHeight="0dp"
+            android:padding="5dp"
+            android:text="@string/str_recorder_normal"
+            android:textColor="#727272" />
+
+    </LinearLayout>
+</LinearLayout>

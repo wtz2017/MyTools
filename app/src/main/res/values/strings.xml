@@ -22,4 +22,8 @@
     <string name="permission_name_install_packages">安装应用</string>
     <string name="permission_name_send_notification">发送通知</string>
     <string name="permission_name_access_notification">访问系统通知</string>
+
+    <string name="str_recorder_normal">按住说话</string>
+    <string name="str_recorder_recording">松开结束</string>
+    <string name="str_recorder_want_cancel">松开手指，取消发送</string>
 </resources>

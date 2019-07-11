@@ -153,6 +153,7 @@ public class IndexFragment extends Fragment implements OnItemClickListener {
         mFragmentList = new ArrayList<FragmentItem>();
         mFragmentList.add(new FragmentItem("DrawerLayout", DrawerLayoutFragment.class.getName()));
         mFragmentList.add(new FragmentItem("通用工具测试", CommonUtilFragment.class.getName()));
+        mFragmentList.add(new FragmentItem("仿微信语音聊天", RecorderFragment.class.getName()));
         mFragmentList.add(new FragmentItem("CameraView", CameraViewFragment.class.getName()));
         mFragmentList.add(new FragmentItem("SurfaceView", SurfaceViewFragment.class.getName()));
         mFragmentList.add(new FragmentItem("SurfaceVideoView", SurfaceVideoViewFragment.class.getName()));
