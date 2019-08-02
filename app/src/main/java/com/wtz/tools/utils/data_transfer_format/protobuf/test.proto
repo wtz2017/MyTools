@@ -1,7 +1,10 @@
-//从“https://developers.google.com/protocol-buffers/docs/downloads”下载安装包
+//从“https://github.com/protocolbuffers/protobuf/releases”下载protoc主工具
+//Android推荐使用JavaLite版本
+//从“https://repo1.maven.org/maven2/com/google/protobuf/”下载protoc-gen-javalite生成工具
 //然后执行如下命令，生成JAVA代码：
-//protoc --java_out=./ Persion.proto
-//通过“--java_out”指定生成JAVA代码保存的目录，后面紧跟“.proto”文件的路径。
+//protoc --javalite_out=./	xxx.proto
+//通过“--javalite_out”指定生成JAVA代码保存的目录，后面紧跟“.proto”文件的路径。
+//代码中引用库compile 'com.google.protobuf:protobuf-lite:x.y.z' 解析库版本(x.y.z)最好和编译用的版本相同
 
 //以下是消息内容：
 
