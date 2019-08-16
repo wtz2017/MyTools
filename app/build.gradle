@@ -80,6 +80,8 @@ dependencies {
     implementation 'com.jakewharton.rxrelay2:rxrelay:2.1.0'
     // netty
     implementation 'io.netty:netty-all:4.1.10.Final'
+    // androidasync
+    implementation 'com.koushikdutta.async:androidasync:2.2.1'
     // protobuf
     implementation 'com.google.protobuf:protobuf-java:3.6.1'
 
