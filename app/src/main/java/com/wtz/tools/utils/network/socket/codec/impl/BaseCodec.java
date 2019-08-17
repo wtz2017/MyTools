@@ -1,6 +1,5 @@
 package com.wtz.tools.utils.network.socket.codec.impl;
 
-import java.lang.reflect.Array;
 
 public class BaseCodec {
 
@@ -16,11 +15,7 @@ public class BaseCodec {
         }
 
         byte[] msgHead = generateHeader(msgBody.length);
-        byte[] result = (byte[]) Array.newInstance(byte.class, msgHead.length + msgBody.length);
-        System.arraycopy(msgHead, 0, result, 0, msgHead.length);
-        System.arraycopy(msgBody, 0, result, msgHead.length, msgBody.length);
-
-        return result;
+        return concat(msgHead, msgBody);
     }
 
     /**
@@ -75,6 +70,13 @@ public class BaseCodec {
         return 5;
     }
 
+    public static byte[] concat(byte[] first, byte[] second) {
+        byte[] result = new byte[first.length + second.length];
+        System.arraycopy(first, 0, result, 0, first.length);
+        System.arraycopy(second, 0, result, first.length, second.length);
+        return result;
+    }
+
     /**
      * 解析出消息 body 字节数组
      *
@@ -115,7 +117,7 @@ public class BaseCodec {
      *
      * @return header info
      */
-    private int[] readRawVarint32Header(byte[] buffer) {
+    public static int[] readRawVarint32Header(byte[] buffer) {
         int varintByteCount = 0;// 头占用字节数
         int varintValue = 0;// 头中记载的消息体长度
 
