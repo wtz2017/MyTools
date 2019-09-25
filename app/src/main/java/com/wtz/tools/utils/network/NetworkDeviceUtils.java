@@ -45,13 +45,54 @@ public class NetworkDeviceUtils {
     private static final String TAG = NetworkDeviceUtils.class.getName();
 
     public static boolean isNetworkConnect(Context context) {
-        ConnectivityManager connectivity = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivity != null) {
-            NetworkInfo info = connectivity.getActiveNetworkInfo();
-            return info != null && info.isAvailable();
+        boolean ret = false;
+
+        try {
+            // catch:  Attempt to read from field 'android.net.NetworkInfo android.net.NetworkState.networkInfo' on a null object reference
+            ConnectivityManager connectivity = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connectivity != null) {
+                NetworkInfo info = connectivity.getActiveNetworkInfo();
+                if (info != null) {
+                    ret = info.isAvailable();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        return false;
+        return ret;
+    }
+
+    public static String getNetType(Context context) {
+        String ret = "No Network";
+
+        try {
+            // catch:  Attempt to read from field 'android.net.NetworkInfo android.net.NetworkState.networkInfo' on a null object reference
+            ConnectivityManager connectivity = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connectivity != null) {
+                NetworkInfo info = connectivity.getActiveNetworkInfo();
+                if (info != null && info.isAvailable()) {
+                    switch (info.getType()) {
+                        case ConnectivityManager.TYPE_WIFI:
+                            ret = "wifi";
+                            break;
+                        case ConnectivityManager.TYPE_ETHERNET:
+                            ret = "ethernet";
+                            break;
+                        case ConnectivityManager.TYPE_MOBILE:
+                            ret = "mobile";
+                            break;
+                        case ConnectivityManager.TYPE_BLUETOOTH:
+                            ret = "bluetooth";
+                            break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ret;
     }
 
     public static String getWlan0Mac(Context context) {
