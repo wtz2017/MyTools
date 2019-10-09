@@ -157,4 +157,28 @@ public class RawRgbUtils {
         return bm;
     }
 
+    public static byte[] convertBitmapToRgb(Bitmap bmp) {
+        int width = bmp.getWidth();
+        int height = bmp.getHeight();
+
+        byte[] rgbData = new byte[width * height * 3];
+        int[] imgData = new int[width * height];
+
+        bmp.getPixels(imgData, 0, width, 0, 0, width, height);
+
+        for (int i = 0; i < height; i += 1) {
+            for (int j = 0; j < width; j += 1) {
+                int pixelVal = imgData[i * width + j];
+                byte r = (byte) ((pixelVal >> 16) & 0xFF);
+                byte g = (byte) ((pixelVal >> 8) & 0xFF);
+                byte b = (byte) ((pixelVal) & 0xFF);
+                rgbData[i * width * 3 + j * 3 + 2] = b;
+                rgbData[i * width * 3 + j * 3 + 1] = g;
+                rgbData[i * width * 3 + j * 3 + 0] = r;
+            }
+        }
+
+        return rgbData;
+    }
+
 }
