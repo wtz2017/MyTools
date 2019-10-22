@@ -11,4 +11,16 @@
     <color name="image_bg_color">#CAE1FF</color>
     <color name="image_press_color">#FFD700</color>
     <color name="image_border_color">#9AFF9A</color>
+
+    <color name="dashboard_color_primary">#00b4aa</color>
+    <color name="dashboard_color_primary_dark">#00978f</color>
+    <color name="dashboard_color_accent">#FF6A6E</color>
+    <color name="dashboard_color_red">#FF5722</color>
+    <color name="dashboard_color_orange">#FF9800</color>
+    <color name="dashboard_color_yellow">#FFC107</color>
+    <color name="dashboard_color_green">#3FB830</color>
+    <color name="dashboard_color_blue">#00BAED</color>
+    <color name="dashboard_color_dark">#263238</color>
+    <color name="dashboard_color_dark_light">#455A64</color>
+    <color name="dashboard_color_light">#ECEFF1</color>
 </resources>

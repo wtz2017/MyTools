@@ -26,4 +26,11 @@
     <string name="str_recorder_normal">按住说话</string>
     <string name="str_recorder_recording">松开结束</string>
     <string name="str_recorder_want_cancel">松开手指，取消发送</string>
+
+    <string name="delete_progress_btn_text">Clean up progress</string>
+    <string name="increase_the_progress_btn_text">Increase the progress： </string>
+    <string name="current_mplitude">Modify amplitude, current: %1$s</string>
+    <string name="current_Disparity">Modify amplitude gap, current: %1$s</string>
+    <string name="current_float_time">Modify movement speed, current: %1$s</string>
+    <string name="current_rotate_time">Modify rotation speed, current: %1$s</string>
 </resources>

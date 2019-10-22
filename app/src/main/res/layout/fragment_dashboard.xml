@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/dashboard_color_yellow"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:id="@+id/dashboard0_layout"
+                android:layout_width="150dip"
+                android:layout_height="150dip"
+                android:orientation="horizontal" />
+
+            <com.wtz.tools.view.custom_view_study.dashboard.DashboardView1
+                android:id="@+id/dashboard_view_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp" />
+
+            <com.wtz.tools.view.custom_view_study.dashboard.DashboardView2
+                android:id="@+id/dashboard_view_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp" />
+
+            <com.wtz.tools.view.custom_view_study.dashboard.DashboardView3
+                android:id="@+id/dashboard_view_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp" />
+
+            <com.wtz.tools.view.custom_view_study.dashboard.DashboardView4
+                android:id="@+id/dashboard_view_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:padding="16dp" />
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

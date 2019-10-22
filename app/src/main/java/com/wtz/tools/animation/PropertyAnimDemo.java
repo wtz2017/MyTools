@@ -1,9 +1,30 @@
 package com.wtz.tools.animation;
 
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 
 public class PropertyAnimDemo {
+
+    public static void testAnimatorSet(View view) {
+        ObjectAnimator animator1 = ObjectAnimator.ofFloat(view, "scaleY", 1f, 3f, 1f);
+
+        view.setBackgroundColor(Color.parseColor("#ff0000"));
+        ColorDrawable backgroundDrawable = (ColorDrawable) view.getBackground();
+        ObjectAnimator animator2 = ObjectAnimator.ofInt(backgroundDrawable, "color",
+                Color.parseColor("#ff0000"), Color.parseColor("#00ff00"));
+
+        ObjectAnimator moveIn = ObjectAnimator.ofFloat(view, "translationX", -500f, 0f);
+        ObjectAnimator rotate = ObjectAnimator.ofFloat(view, "rotation", 0f, 360f);
+        ObjectAnimator fadeInOut = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f, 1f);
+
+        AnimatorSet animSet = new AnimatorSet();
+        animSet.play(rotate).with(fadeInOut).with(animator1).with(animator2).after(moveIn);
+        animSet.setDuration(5000);
+        animSet.start();
+    }
 
     public static void rotateZ(View target) {
         ObjectAnimator anim = ObjectAnimator.ofFloat(

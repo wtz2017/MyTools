@@ -26,6 +26,23 @@ import com.wtz.tools.test.WebViewActivity;
 import com.wtz.tools.test.aac.view.CityIpActivity;
 import com.wtz.tools.test.adapter.IndexListAdapter;
 import com.wtz.tools.test.data.FragmentItem;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentAccumulateDrawbitmap;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentAccumulateRotate;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentAccumulateScale;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentBezier;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentCameraRotate;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentDashboard;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentGesture;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentLeafLoading;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentMatrixBasicUse;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentMultitouch;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentPathBooleanOp;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentPathMeasure;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentPie;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentPoly;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentTouchRegion;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentVerificationCode;
+import com.wtz.tools.test.fragment.custom_view_study.FragmentVerticalOffsetLayout;
 import com.wtz.tools.utils.ScreenUtils;
 import com.wtz.tools.utils.SystemInfoUtils;
 import com.wtz.tools.view.BottomLoadListView;
@@ -186,6 +203,25 @@ public class IndexFragment extends Fragment implements OnItemClickListener {
         mFragmentList.add(new FragmentItem("ActionBar", ActionBarActivity.class.getName(), true, ActionBarActivity.class));
         mFragmentList.add(new FragmentItem("屏保演示", ScreenSaverFragment.class.getName()));
         mFragmentList.add(new FragmentItem("权限管理", PermissionActivity.class.getName(), true, PermissionActivity.class));
+
+        // 自定义 View 演示
+        mFragmentList.add(new FragmentItem("测量、布局、绘制 Demo", FragmentVerticalOffsetLayout.class.getName()));
+        mFragmentList.add(new FragmentItem("验证码", FragmentVerificationCode.class.getName()));
+        mFragmentList.add(new FragmentItem("GALeafLoading进度条", FragmentLeafLoading.class.getName()));
+        mFragmentList.add(new FragmentItem("canvas.scale累积效果", FragmentAccumulateScale.class.getName()));
+        mFragmentList.add(new FragmentItem("canvas.rotate累积效果", FragmentAccumulateRotate.class.getName()));
+        mFragmentList.add(new FragmentItem("canvas.drawBitmap指定区域绘制", FragmentAccumulateDrawbitmap.class.getName()));
+        mFragmentList.add(new FragmentItem("canvas.drawArc饼图", FragmentPie.class.getName()));
+        mFragmentList.add(new FragmentItem("canvas.drawPath-贝赛尔曲线", FragmentBezier.class.getName()));
+        mFragmentList.add(new FragmentItem("canvas.drawPath-Op(api>=19)", FragmentPathBooleanOp.class.getName()));
+        mFragmentList.add(new FragmentItem("canvas.drawPath-PathMeasure", FragmentPathMeasure.class.getName()));
+        mFragmentList.add(new FragmentItem("Matrix基本用法", FragmentMatrixBasicUse.class.getName()));
+        mFragmentList.add(new FragmentItem("Matrix.setPolyToPoly(多边形)", FragmentPoly.class.getName()));
+        mFragmentList.add(new FragmentItem("camera.rotate(3D效果)", FragmentCameraRotate.class.getName()));
+        mFragmentList.add(new FragmentItem("TouchEvent、Region及Canvas坐标系", FragmentTouchRegion.class.getName()));
+        mFragmentList.add(new FragmentItem("Multitouch多点触控应用", FragmentMultitouch.class.getName()));
+        mFragmentList.add(new FragmentItem("Gesture触摸手势检测", FragmentGesture.class.getName()));
+        mFragmentList.add(new FragmentItem("Dashboard仪表盘", FragmentDashboard.class.getName()));
     }
 
     private void initListViewData(View parent) {

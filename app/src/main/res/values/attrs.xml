@@ -28,4 +28,9 @@
         <attr name="textSize" format="dimension" />
     </declare-styleable>
 
+    <declare-styleable name="VerificationCodeView">
+        <attr name="verificationCodeText" format="string" />
+        <attr name="verificationCodeTextColor" format="color" />
+        <attr name="verificationCodeTextSize" format="dimension" />
+    </declare-styleable>
 </resources>
