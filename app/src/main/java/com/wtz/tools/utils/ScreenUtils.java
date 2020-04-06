@@ -1,15 +1,28 @@
 package com.wtz.tools.utils;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import java.lang.reflect.Method;
 
+import static android.view.View.NO_ID;
+import static android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+import static android.view.View.SYSTEM_UI_FLAG_IMMERSIVE;
+
 public class ScreenUtils {
+
+    public static boolean isPortrait(Context context) {
+        return context.getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_PORTRAIT;
+    }
 
     /**
      * 获取手机屏幕分辨率
@@ -77,6 +90,7 @@ public class ScreenUtils {
 
     /**
      * 获取状态栏高度
+     *
      * @param context
      * @return
      */
@@ -92,6 +106,35 @@ public class ScreenUtils {
             result = resources.getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    private static final String NAVIGATION = "navigationBarBackground";
+
+    /**
+     * 该方法需要在View完全被绘制出来之后调用，否则判断不了
+     *
+     * @param activity
+     * @return
+     */
+    public static boolean isNavigationBarExist(Activity activity) {
+        ViewGroup vp = (ViewGroup) activity.getWindow().getDecorView();
+        if (vp != null) {
+            for (int i = 0; i < vp.getChildCount(); i++) {
+                vp.getChildAt(i).getContext().getPackageName();
+                if (vp.getChildAt(i).getId() != NO_ID
+                        && NAVIGATION.equals(activity.getResources().getResourceEntryName(
+                        vp.getChildAt(i).getId()))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static void hideNavigationBar(Activity activity) {
+        View decorView = activity.getWindow().getDecorView();
+        int option = SYSTEM_UI_FLAG_HIDE_NAVIGATION | SYSTEM_UI_FLAG_IMMERSIVE;
+        decorView.setSystemUiVisibility(option);
     }
 
 }

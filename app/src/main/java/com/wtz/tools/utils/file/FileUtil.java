@@ -220,6 +220,31 @@ public class FileUtil {
         }
     }
 
+    public static String readRawText(Context context, int rawId) {
+        BufferedReader reader = null;
+        StringBuffer sb = new StringBuffer();
+        try {
+            InputStream inputStream = context.getResources().openRawResource(rawId);
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            reader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return sb.toString();
+    }
+
     public static String readFile(String filePath) {
         StringBuilder builder = new StringBuilder();
         BufferedReader reader = null;
