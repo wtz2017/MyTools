@@ -6,6 +6,9 @@ public class SortUtils {
 
     /**
      * 插入排序：
+     * 插入排序的基本思想是，每次将 1 个待排序的记录按其关键字大小插入到前面已经排好序的子序列中，
+     * 寻找最适当的位置，直至全部记录插入完毕。
+     * <p>
      * 给一数组[0, N],取i从1到N遍历，表示排序趟数；
      * 每一趟比较时，保证[0,i-1]已经有序，取第i位元素依次与[0,i-1]里的元素比较，找到正确位置插入
      *
@@ -24,24 +27,25 @@ public class SortUtils {
         }
     }
 
+
     /**
      * 冒泡排序：
      * 以从小到大排序为例：
-     * 给一数组[0, N],第一层大循环取i从0到N遍历,第二层小循环取j从i+1到N遍历：
-     * 在小循环中，始终拿标号为i位置的元素依次与i+1往后位置的元素比较，
-     * 每比较到更小的元素，就通过互换把小值更新到标号为i位置，这样一趟下来，第i位置就是与后边相比最小的
+     * 给一数组 [0, N]，第一层大循环取 i 从 0 到 N-1 遍历，第二层小循环取 j 从 0 到 N-1-i 遍历：
+     * 在小循环中，逐一比较相邻的 j 和 j+1 两个元素，两者顺序不对就直接交换位置；
+     * 这样一趟下来，第 N-i 位置就是最大的。
      *
      * @param array 数组引用变量
      * @param <T>   数组元素类型
      */
     public static <T extends Comparable<? super T>> void bubbleSort(T[] array) {
         T temp;
-        for (int i = 0; i < array.length; i++) {
-            for (int j = i + 1; j < array.length; j++) {
-                if (array[i].compareTo(array[j]) > 0) {
-                    temp = array[i];
-                    array[i] = array[j];
-                    array[j] = temp;
+        for (int i = 0; i < array.length - 1; i++) {
+            for (int j = 0; j < array.length - 1 - i; j++) {
+                if (array[j].compareTo(array[j + 1]) > 0) {
+                    temp = array[j];
+                    array[j] = array[j + 1];
+                    array[j + 1] = temp;
                 }
             }
         }
@@ -49,9 +53,12 @@ public class SortUtils {
 
     /**
      * 选择排序：
+     * 选择排序算法的基本思路是为每一个位置选择当前最小的元素。
+     * <p>
      * 与冒泡排序类似，也是两层循环，第一层循环表示比较的趟数，第二层循环表示每一趟具体的比较；
-     * 区别在于第二层循环比较中，冒泡排序是找到更小或更大的元素时，会直接与第i趟标号i的位置元素直接交换；
-     * 而选择排序只是把标号存下来，等一趟比较完成后再把最终标号的元素与标号i的位置元素交换。
+     * 区别在于第二层循环比较中，冒泡排序是逐一比较相邻的两个元素，两者顺序不对就直接交换位置；
+     * 而选择排序是从前往后逐一跟标号i的位置元素比较，找到更小或更大的元素时，只是把标号存下来，
+     * 等一趟比较完成后再把最终标号的元素与标号i的位置元素交换。
      *
      * @param array
      * @param <T>
@@ -59,7 +66,7 @@ public class SortUtils {
     public static <T extends Comparable<? super T>> void selectSort(T[] array) {
         T temp;
         int index;
-        for (int i = 0; i < array.length; i++) {
+        for (int i = 0; i < array.length - 1; i++) {
             index = i;
             for (int j = i + 1; j < array.length; j++) {
                 if (array[index].compareTo(array[j]) > 0) {
