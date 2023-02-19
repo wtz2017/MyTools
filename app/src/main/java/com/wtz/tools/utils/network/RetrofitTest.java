@@ -480,6 +480,38 @@ public class RetrofitTest {
         }
     }
 
+    static class RetryIntercepter implements Interceptor {
+        public int maxRetryCount;
+        private int count = 0;
+
+        public RetryIntercepter(int maxRetryCount) {
+            this.maxRetryCount = maxRetryCount;
+        }
+
+        @Override
+        public okhttp3.Response intercept(Chain chain) throws IOException {
+            okhttp3.Response response = doRequest(chain, chain.request());
+            while (response == null && count <= maxRetryCount) {
+                System.out.println("Request is not successful - " + count);
+                response = doRequest(chain, chain.request());
+            }
+            if (response == null) {
+                throw new IOException(chain.request().url().toString());
+            }
+            return response;
+        }
+
+        private okhttp3.Response doRequest(Chain chain, Request request) {
+            count++;
+            okhttp3.Response response = null;
+            try {
+                response = chain.proceed(request);
+            } catch (Exception e) {
+            }
+            return response;
+        }
+    }
+
     static class HttpLoggingInterceptor implements Interceptor {
 
         String tag = "HttpLoggingInterceptor";

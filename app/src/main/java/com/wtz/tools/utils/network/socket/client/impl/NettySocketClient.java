@@ -107,6 +107,8 @@ public class NettySocketClient extends BaseSocketClient implements ISocketClient
             if (evt instanceof IdleStateEvent) {
                 IdleStateEvent event = (IdleStateEvent) evt;
                 if (event.state().equals(IdleState.WRITER_IDLE)) {
+                    // 这种方式实现物理连接心跳，防止断开长连接；
+                    // 但若依赖心跳定时传递消息的话，就必须另外实现一个定时的业务心跳
                     mSocketStateListener.onHeartbeatTime();
                 }
             }
